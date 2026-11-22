@@ -37,6 +37,14 @@ vi.mock("@/i18n/routing", () => ({
   usePathname: () => "/dashboard/customers",
 }));
 
+vi.mock("@/stores/auth-store", () => ({
+  useAuthStore: (selector: any) => selector({
+    user: { id: 1, username: "admin", roles: ["Admin"] },
+    isAuthenticated: true,
+    isLoading: false,
+  }),
+}));
+
 describe("CustomerListView Component", () => {
   let queryClient: QueryClient;
 

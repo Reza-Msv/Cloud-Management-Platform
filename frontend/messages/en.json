@@ -18,6 +18,7 @@
     "all": "All",
     "noData": "No data available",
     "notFound": "Resource not found",
+    "confirm": "Confirm",
     "required": "Required",
     "id": "ID",
     "created": "Created"
@@ -85,7 +86,8 @@
     "loginAs": "Sign in as:",
     "adminRole": "Admin",
     "operatorRole": "Operator",
-    "backToHome": "Back to Home"
+    "backToHome": "Back to Home",
+    "loginSuccess": "Signed in successfully"
   },
   "Dashboard": {
     "overview": "Overview",
@@ -99,6 +101,8 @@
     "suspendedServices": "Suspended Services",
     "suspendedServicesDesc": "Paused or administrative holds",
     "recentCustomers": "Recent Customers",
+    "recentCustomersDesc": "Recently registered enterprise clients",
+    "noRecentCustomers": "No recent customer activity.",
     "recentServices": "Recent Services",
     "recentServicesDesc": "Recently provisioned cloud infrastructure",
     "noRecentServices": "No recent services deployed.",

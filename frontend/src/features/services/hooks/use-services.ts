@@ -30,13 +30,14 @@ export function useService(id: number) {
   });
 }
 
-export function useUpdateServiceStatus(id: number) {
+export function useUpdateServiceStatus() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (status: ServiceStatus) => servicesApi.updateStatus(id, status),
-    onSuccess: (updatedService) => {
-      queryClient.setQueryData([...SERVICES_QUERY_KEY, id], updatedService);
+    mutationFn: ({ id, status }: { id: number; status: ServiceStatus }) =>
+      servicesApi.updateStatus(id, status),
+    onSuccess: (updatedService, variables) => {
+      queryClient.setQueryData([...SERVICES_QUERY_KEY, variables.id], updatedService);
       queryClient.invalidateQueries({ queryKey: SERVICES_QUERY_KEY });
       queryClient.invalidateQueries({
         queryKey: ["customers", updatedService.customer, "services"],

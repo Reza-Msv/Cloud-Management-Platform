@@ -18,6 +18,7 @@
     "all": "همه",
     "noData": "اطلاعاتی موجود نیست",
     "notFound": "منبع مورد نظر یافت نشد",
+    "confirm": "تأیید",
     "required": "الزامی",
     "id": "شناسه",
     "created": "تاریخ ایجاد"
@@ -85,7 +86,8 @@
     "loginAs": "ورود با نقش:",
     "adminRole": "مدیر سیستم (Admin)",
     "operatorRole": "اپراتور (Operator)",
-    "backToHome": "بازگشت به صفحه اصلی"
+    "backToHome": "بازگشت به صفحه اصلی",
+    "loginSuccess": "ورود به سیستم با موفقیت انجام شد"
   },
   "Dashboard": {
     "overview": "نمای کلی",
@@ -99,6 +101,8 @@
     "suspendedServices": "سرویس‌های معلق",
     "suspendedServicesDesc": "متوقف یا تعلیق‌شده مدیریتی",
     "recentCustomers": "مشتریان اخیر",
+    "recentCustomersDesc": "مشتریان سازمانی اخیراً ثبت‌نام‌شده",
+    "noRecentCustomers": "هیچ فعالیت مشتری اخیری ثبت نشده است.",
     "recentServices": "سرویس‌های اخیر",
     "recentServicesDesc": "زیرساخت‌های ابری اخیراً تخصیص‌یافته",
     "noRecentServices": "هیچ سرویس اخیری مستقر نشده است.",

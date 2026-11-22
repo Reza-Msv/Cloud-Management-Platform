@@ -25,6 +25,14 @@ vi.mock("@/i18n/routing", () => ({
   usePathname: () => "/dashboard/services",
 }));
 
+vi.mock("@/stores/auth-store", () => ({
+  useAuthStore: (selector: any) => selector({
+    user: { id: 1, username: "admin", roles: ["Admin"] },
+    isAuthenticated: true,
+    isLoading: false,
+  }),
+}));
+
 describe("ServiceListView Component", () => {
   let queryClient: QueryClient;
 
@@ -64,7 +72,7 @@ describe("ServiceListView Component", () => {
 
     await waitFor(() => {
       expect(screen.getByText("Production Database Server")).toBeInTheDocument();
-      expect(screen.getByText("active")).toBeInTheDocument();
+      expect(screen.getAllByText("Active").length).toBeGreaterThanOrEqual(1);
     });
   });
 });

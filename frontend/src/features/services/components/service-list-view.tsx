@@ -12,10 +12,12 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select } from "@/components/ui/select";
+import { Dialog } from "@/components/ui/dialog";
 import { SERVICE_TYPES } from "@/constants";
 import { Server, RefreshCw, Eye, Filter } from "lucide-react";
 import { ServiceStatus } from "@/types";
 import { formatDate } from "@/lib/utils";
+import { toast } from "sonner";
 
 export function ServiceListView() {
   const t = useTranslations("Services");
@@ -27,6 +29,10 @@ export function ServiceListView() {
   const [pageSize] = useState(10);
   const [statusFilter, setStatusFilter] = useState<string>("");
   const [typeFilter, setTypeFilter] = useState<string>("");
+  const [pendingStatusChange, setPendingStatusChange] = useState<{
+    serviceId: number;
+    nextStatus: ServiceStatus;
+  } | null>(null);
 
   const { data, isLoading, isError, error } = useServices({
     page,
@@ -35,12 +41,26 @@ export function ServiceListView() {
     service_type: typeFilter || undefined,
   });
 
-  const updateStatusMutation = useUpdateServiceStatus(0);
+  const updateStatusMutation = useUpdateServiceStatus();
 
-  const handleToggleStatus = async (serviceId: number, currentStatus: ServiceStatus) => {
+  const handleToggleStatus = (serviceId: number, currentStatus: ServiceStatus) => {
     const nextStatus = currentStatus === "active" ? "suspended" : "active";
-    if (confirm(t("confirmStatusChange", { status: nextStatus }))) {
-      await updateStatusMutation.mutateAsync(nextStatus);
+    setPendingStatusChange({ serviceId, nextStatus });
+  };
+
+  const handleConfirmStatusChange = async () => {
+    if (!pendingStatusChange) return;
+    try {
+      await updateStatusMutation.mutateAsync({
+        id: pendingStatusChange.serviceId,
+        status: pendingStatusChange.nextStatus,
+      });
+      toast.success(t("statusUpdated"));
+      setPendingStatusChange(null);
+    } catch (err) {
+      const errMsg = err instanceof Error ? err.message : tCommon("notFound");
+      toast.error(errMsg);
+      console.error(err);
     }
   };
 
@@ -186,6 +206,42 @@ export function ServiceListView() {
           )}
         </CardContent>
       </Card>
+
+      {/* Status Change Confirmation Modal */}
+      <Dialog
+        open={Boolean(pendingStatusChange)}
+        onOpenChange={(open) => {
+          if (!open) setPendingStatusChange(null);
+        }}
+        title={t("changeStatus")}
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-foreground">
+            {pendingStatusChange &&
+              t("confirmStatusChange", {
+                status: tStatus(pendingStatusChange.nextStatus),
+              })}
+          </p>
+
+          <div className="flex justify-end gap-2 pt-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setPendingStatusChange(null)}
+              disabled={updateStatusMutation.isPending}
+            >
+              {tCommon("cancel")}
+            </Button>
+            <Button
+              type="button"
+              onClick={handleConfirmStatusChange}
+              disabled={updateStatusMutation.isPending}
+            >
+              {updateStatusMutation.isPending ? tCommon("loading") : tCommon("confirm")}
+            </Button>
+          </div>
+        </div>
+      </Dialog>
     </div>
   );
 }

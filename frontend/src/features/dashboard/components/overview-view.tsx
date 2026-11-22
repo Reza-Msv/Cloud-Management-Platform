@@ -223,6 +223,18 @@ export function OverviewView() {
                       d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                     />
                   )}
+                  {/* Suspended Services Stroke */}
+                  {totalServices > 0 && suspendedServices > 0 && (
+                    <path
+                      className="text-amber-500 stroke-current transition-all duration-700"
+                      strokeDasharray={`${Math.round((suspendedServices / (totalCustomers + totalServices)) * 100)}, 100`}
+                      strokeDashoffset={`-${Math.round(((totalCustomers + activeServices) / (totalCustomers + totalServices)) * 100)}`}
+                      strokeWidth="3.5"
+                      strokeLinecap="round"
+                      fill="none"
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                  )}
                 </svg>
                 <div className="absolute flex flex-col items-center justify-center text-center">
                   <span className="text-2xl font-bold tracking-tight">
@@ -261,8 +273,8 @@ export function OverviewView() {
           <CardHeader className="flex flex-row items-center justify-between pb-4">
             <div>
               <CardTitle className="text-sm font-semibold">{t("recentCustomers")}</CardTitle>
-              <CardDescription className="text-xs">
-                Recently registered enterprise clients
+              <CardDescription className="text-xs py-1">
+                {t("recentCustomersDesc")}
               </CardDescription>
             </div>
             <Link
@@ -290,7 +302,7 @@ export function OverviewView() {
               </div>
             ) : (
               <p className="py-4 text-center text-xs text-muted-foreground">
-                No recent customer activity.
+                {t("noRecentCustomers")}
               </p>
             )}
           </CardContent>
@@ -301,7 +313,7 @@ export function OverviewView() {
           <CardHeader className="flex flex-row items-center justify-between pb-4">
             <div>
               <CardTitle className="text-sm font-semibold">{t("recentServices")}</CardTitle>
-              <CardDescription className="text-xs">
+              <CardDescription className="text-xs py-1">
                 {t("recentServicesDesc")}
               </CardDescription>
             </div>

@@ -18,6 +18,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { formatDate } from "@/lib/utils";
+import { toast } from "sonner";
 
 const createCustomerSchema = (t: (key: string) => string) =>
   z.object({
@@ -82,18 +83,18 @@ export function CustomerListView() {
     try {
       setApiError(null);
       await createMutation.mutateAsync(values);
+      toast.success(t("createSuccess"));
       reset();
       setModalOpen(false);
     } catch (err: unknown) {
       if (err instanceof Error) {
         const msg = err.message;
-        if (msg.includes("already exists")) {
-          setApiError(tVal("emailAlreadyExists"));
-        } else {
-          setApiError(msg);
-        }
+        const finalMsg = msg.includes("already exists") ? tVal("emailAlreadyExists") : msg;
+        setApiError(finalMsg);
+        toast.error(finalMsg);
       } else {
         setApiError(tCommon("notFound"));
+        toast.error(tCommon("notFound"));
       }
     }
   };

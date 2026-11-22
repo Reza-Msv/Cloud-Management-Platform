@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { LanguageToggle } from "@/components/shared/language-toggle";
+import { toast } from "sonner";
 
 const createLoginSchema = (t: (key: string) => string) =>
   z.object({
@@ -47,12 +48,15 @@ export function LoginForm() {
     try {
       setFormError(null);
       await login(values);
+      toast.success(tAuth("loginSuccess"));
       router.replace("/dashboard");
     } catch (err: unknown) {
       if (err instanceof Error) {
         setFormError(err.message || tAuth("loginError"));
+        toast.error(err.message || tAuth("loginError"));
       } else {
         setFormError(tAuth("loginError"));
+        toast.error(tAuth("loginError"));
       }
     }
   };

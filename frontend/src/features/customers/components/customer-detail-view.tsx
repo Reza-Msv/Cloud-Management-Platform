@@ -20,6 +20,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { formatDate } from "@/lib/utils";
+import { toast } from "sonner";
 
 const createServiceSchema = (t: (key: string) => string) =>
   z.object({
@@ -47,12 +48,16 @@ export function CustomerDetailView({ customerId }: CustomerDetailViewProps) {
 
   const [addServiceModal, setAddServiceModal] = useState(false);
   const [modalError, setModalError] = useState<string | null>(null);
+  const [pendingStatusChange, setPendingStatusChange] = useState<{
+    serviceId: number;
+    nextStatus: "active" | "suspended";
+  } | null>(null);
 
   const { data: customer, isLoading, isError, error } = useCustomer(customerId);
   const { data: servicesData, isLoading: isServicesLoading } = useCustomerServices(customerId);
 
   const createServiceMutation = useCreateCustomerService(customerId);
-  const updateStatusMutation = useUpdateServiceStatus(0); // dynamic id
+  const updateStatusMutation = useUpdateServiceStatus();
 
   const {
     register,
@@ -71,21 +76,38 @@ export function CustomerDetailView({ customerId }: CustomerDetailViewProps) {
     try {
       setModalError(null);
       await createServiceMutation.mutateAsync(values);
+      toast.success(tServices("createSuccess"));
       reset();
       setAddServiceModal(false);
     } catch (err: unknown) {
       if (err instanceof Error) {
         setModalError(err.message);
+        toast.error(err.message);
       } else {
         setModalError("Failed to add service");
+        toast.error(tCommon("notFound"));
       }
     }
   };
 
-  const handleToggleStatus = async (serviceId: number, currentStatus: "active" | "suspended") => {
+  const handleToggleStatus = (serviceId: number, currentStatus: "active" | "suspended") => {
     const nextStatus = currentStatus === "active" ? "suspended" : "active";
-    if (confirm(tServices("confirmStatusChange", { status: nextStatus }))) {
-      await updateStatusMutation.mutateAsync(nextStatus);
+    setPendingStatusChange({ serviceId, nextStatus });
+  };
+
+  const handleConfirmStatusChange = async () => {
+    if (!pendingStatusChange) return;
+    try {
+      await updateStatusMutation.mutateAsync({
+        id: pendingStatusChange.serviceId,
+        status: pendingStatusChange.nextStatus,
+      });
+      toast.success(tServices("statusUpdated"));
+      setPendingStatusChange(null);
+    } catch (err) {
+      const errMsg = err instanceof Error ? err.message : tCommon("notFound");
+      toast.error(errMsg);
+      console.error(err);
     }
   };
 
@@ -319,6 +341,42 @@ export function CustomerDetailView({ customerId }: CustomerDetailViewProps) {
             </Button>
           </div>
         </form>
+      </Dialog>
+
+      {/* Status Change Confirmation Modal */}
+      <Dialog
+        open={Boolean(pendingStatusChange)}
+        onOpenChange={(open) => {
+          if (!open) setPendingStatusChange(null);
+        }}
+        title={tServices("changeStatus")}
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-foreground">
+            {pendingStatusChange &&
+              tServices("confirmStatusChange", {
+                status: tStatus(pendingStatusChange.nextStatus),
+              })}
+          </p>
+
+          <div className="flex justify-end gap-2 pt-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setPendingStatusChange(null)}
+              disabled={updateStatusMutation.isPending}
+            >
+              {tCommon("cancel")}
+            </Button>
+            <Button
+              type="button"
+              onClick={handleConfirmStatusChange}
+              disabled={updateStatusMutation.isPending}
+            >
+              {updateStatusMutation.isPending ? tCommon("loading") : tCommon("confirm")}
+            </Button>
+          </div>
+        </div>
       </Dialog>
     </div>
   );
