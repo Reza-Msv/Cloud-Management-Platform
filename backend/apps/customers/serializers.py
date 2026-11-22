@@ -2,7 +2,7 @@ from django.db import IntegrityError
 from rest_framework import serializers
 
 from apps.customers.models import Customer
-from apps.customers.services import create_customer
+from apps.customers.services import create_customer, update_customer
 
 
 class CustomerSerializer(serializers.ModelSerializer):
@@ -26,12 +26,23 @@ class CustomerSerializer(serializers.ModelSerializer):
 
     def validate_email(self, value):
         normalized_email = value.lower().strip()
-        if Customer.objects.filter(email__iexact=normalized_email).exists():
+        qs = Customer.objects.filter(email__iexact=normalized_email)
+        # In update operations, exclude current instance from duplicate check
+        if self.instance is not None:
+            qs = qs.exclude(id=self.instance.id)
+
+        if qs.exists():
             raise serializers.ValidationError('Customer with this email already exists.')
         return normalized_email
 
     def create(self, validated_data):
         try:
             return create_customer(**validated_data)
+        except IntegrityError:
+            raise serializers.ValidationError({'email': ['Customer with this email already exists.']})
+
+    def update(self, instance, validated_data):
+        try:
+            return update_customer(customer=instance, **validated_data)
         except IntegrityError:
             raise serializers.ValidationError({'email': ['Customer with this email already exists.']})

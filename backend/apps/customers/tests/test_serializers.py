@@ -55,3 +55,23 @@ class CustomerSerializerTest(TestCase):
         customer = serializer.save()
         self.assertNotEqual(customer.id, 999)
         self.assertEqual(serializer.data['full_name'], 'Reza Mousavi')
+
+    def test_update_allows_own_email(self):
+        """Serializer permits keeping the customer's own email during update."""
+        customer = Customer.objects.create(**self.valid_payload)
+        update_data = {'first_name': 'UpdatedName', 'email': customer.email}
+        serializer = CustomerSerializer(instance=customer, data=update_data, partial=True)
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        updated = serializer.save()
+        self.assertEqual(updated.first_name, 'UpdatedName')
+        self.assertEqual(updated.email, customer.email)
+
+    def test_update_rejects_other_customer_email(self):
+        """Serializer rejects changing email to another existing customer's email."""
+        c1 = Customer.objects.create(**self.valid_payload)
+        c2 = Customer.objects.create(
+            first_name='Other', last_name='User', email='other@example.com', phone='+123'
+        )
+        serializer = CustomerSerializer(instance=c1, data={'email': c2.email}, partial=True)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('email', serializer.errors)
