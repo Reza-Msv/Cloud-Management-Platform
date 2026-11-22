@@ -1,10 +1,20 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import React from "react";
 import { HomeView } from "@/app/[locale]/(web)/(home)/page";
 import { NextIntlClientProvider } from "next-intl";
 import { AppThemeProvider } from "@/hooks/use-app-theme";
 import messages from "../../messages/en.json";
+
+vi.mock("@/i18n/routing", () => ({
+  Link: ({ children, href, ...props }: any) => <a href={href} {...props}>{children}</a>,
+  useRouter: () => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+    prefetch: vi.fn(),
+  }),
+  usePathname: () => "/",
+}));
 
 describe("HomeView Component", () => {
   it("renders status badge, application title, and theme controls", () => {
