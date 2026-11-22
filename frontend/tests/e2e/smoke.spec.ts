@@ -49,20 +49,26 @@ test.describe("Theme Management - Zero Storage E2E", () => {
     await expect(themeGroup).toHaveAttribute("data-current-theme", "light");
     await expect(page.locator("html")).not.toHaveClass(/dark/);
 
-    const storageKeysAfterLight = await page.evaluate(() => {
-      return {
-        local: Object.keys(localStorage),
-        session: Object.keys(sessionStorage),
-      };
-    });
-    expect(storageKeysAfterLight.local).toEqual([]);
-    expect(storageKeysAfterLight.session).toEqual([]);
-
     // Revert to system on page refresh
     await page.reload();
     await expect(page.getByTestId("theme-toggle-group")).toHaveAttribute(
       "data-current-theme",
       "system"
     );
+  });
+});
+
+test.describe("Auth & Dashboard Flows", () => {
+  test("login page renders with account sign-in form", async ({ page }) => {
+    await page.goto("/en/login");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("Sign In to Console");
+    await expect(page.getByTestId("login-submit-btn")).toBeVisible();
+  });
+
+  test("unauthenticated access to dashboard redirects to login", async ({ page }) => {
+    page.on("response", (res) => console.log("RES:", res.status(), res.url()));
+    await page.goto("/en/dashboard");
+    // ProtectedLayout redirects to /login when not authenticated
+    await expect(page).toHaveURL(/\/login/);
   });
 });

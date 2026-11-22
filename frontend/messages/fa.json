@@ -4,7 +4,23 @@
     "description": "کنترل پنل سازمانی ابری و زیرساخت",
     "status": "سیستم فعال است",
     "loading": "در حال بارگذاری...",
-    "welcome": "به سامانه مدیریت ابری خوش آمدید"
+    "welcome": "به سامانه مدیریت ابری خوش آمدید",
+    "previous": "قبلی",
+    "next": "بعدی",
+    "showingResults": "نمایش {from} تا {to} از مجموع {total} مورد",
+    "save": "ذخیره",
+    "cancel": "انصراف",
+    "actions": "عملیات",
+    "details": "جزئیات",
+    "search": "جستجو...",
+    "searchPlaceholder": "جستجو بر اساس نام، ایمیل، تلفن...",
+    "filter": "فیلتر",
+    "all": "همه",
+    "noData": "اطلاعاتی موجود نیست",
+    "notFound": "منبع مورد نظر یافت نشد",
+    "required": "الزامی",
+    "id": "شناسه",
+    "created": "تاریخ ایجاد"
   },
   "Theme": {
     "toggle": "تغییر تم",
@@ -14,15 +30,91 @@
   },
   "Navigation": {
     "home": "صفحه اصلی",
-    "dashboard": "داشبورد",
+    "dashboard": "نمای کلی",
     "services": "سرویس‌ها",
-    "customers": "مشتریان"
+    "customers": "مشتریان",
+    "login": "ورود",
+    "logout": "خروج"
+  },
+  "Auth": {
+    "title": "ورود به کنترل پنل",
+    "subtitle": "برای دسترسی به پنل مدیریت ابری، مشخصات حساب خود را وارد کنید",
+    "username": "نام کاربری",
+    "usernamePlaceholder": "نام کاربری خود را وارد کنید",
+    "password": "رمز عبور",
+    "passwordPlaceholder": "رمز عبور خود را وارد کنید",
+    "signIn": "ورود به سیستم",
+    "signingIn": "در حال احراز هویت...",
+    "loginError": "مشخصات وارد شده نادرست است یا حساب کاربری غیرفعال می‌باشد.",
+    "role": "نقش",
+    "permissions": "دسترسی‌ها"
+  },
+  "Dashboard": {
+    "overview": "نمای کلی",
+    "overviewDescription": "شاخص‌های کلیدی عملکرد و وضعیت زیرساخت ابری",
+    "totalCustomers": "مجموع مشتریان",
+    "totalCustomersDesc": "مشتریان ثبت‌شده در سامانه",
+    "totalServices": "مجموع سرویس‌ها",
+    "totalServicesDesc": "سرویس‌های ابری تخصیص‌یافته",
+    "activeServices": "سرویس‌های فعال",
+    "activeServicesDesc": "در حال اجرا در پروداکشن",
+    "suspendedServices": "سرویس‌های معلق",
+    "suspendedServicesDesc": "متوقف یا تعلیق‌شده مدیریتی",
+    "recentCustomers": "مشتریان اخیر",
+    "recentServices": "سرویس‌های اخیر",
+    "viewAll": "مشاهده همه"
+  },
+  "Customers": {
+    "title": "مدیریت مشتریان",
+    "description": "مدیریت حساب‌های سازمانی مشتریان، اطلاعات تماس و سرویس‌های تخصیص‌یافته",
+    "addCustomer": "افزودن مشتری",
+    "customerDetails": "مشخصات مشتری",
+    "fullName": "نام و نام خانوادگی",
+    "firstName": "نام",
+    "lastName": "نام خانوادگی",
+    "email": "پست الکترونیک",
+    "phone": "شماره تماس",
+    "registeredAt": "تاریخ ثبت‌نام",
+    "servicesCount": "سرویس‌های تخصیص‌یافته",
+    "customerNotFound": "مشتری مورد نظر یافت نشد.",
+    "createSuccess": "مشتری با موفقیت ثبت شد.",
+    "editCustomer": "ویرایش مشتری",
+    "updateSuccess": "اطلاعات مشتری با موفقیت به‌روزرسانی شد.",
+    "servicesBelonging": "سرویس‌های متعلق به مشتری",
+    "addServiceToCustomer": "تخصیص سرویس جدید"
+  },
+  "Services": {
+    "title": "مدیریت سرویس‌ها",
+    "description": "نظارت و کنترل سرورهای ابری، سرورهای مجازی و فضاهای ذخیره‌سازی",
+    "addService": "افزودن سرویس",
+    "serviceDetails": "جزئیات سرویس",
+    "name": "نام سرویس",
+    "type": "نوع سرویس",
+    "status": "وضعیت",
+    "customer": "شناسه مشتری",
+    "changeStatus": "تغییر وضعیت",
+    "confirmStatusChange": "آیا از تغییر وضعیت این سرویس به {status} اطمینان دارید؟",
+    "statusUpdated": "وضعیت سرویس با موفقیت به‌روزرسانی شد.",
+    "createSuccess": "سرویس با موفقیت راه‌اندازی شد.",
+    "noServices": "هیچ سرویسی یافت نشد."
+  },
+  "serviceTypes": {
+    "vps": "سرور مجازی (VPS)",
+    "cloud_server": "سرور ابری",
+    "dedicated_server": "سرور اختصاصی",
+    "cloud_storage": "فضای ذخیره‌سازی ابری"
+  },
+  "serviceStatus": {
+    "active": "فعال",
+    "suspended": "معلق"
   },
   "Errors": {
     "notFoundTitle": "صفحه یافت نشد",
     "notFoundDescription": "منبع مورد نظر پیدا نشد.",
     "serverErrorTitle": "خطایی رخ داده است",
     "serverErrorDescription": "یک خطای غیرمنتظره رخ داد. لطفاً دوباره تلاش کنید.",
-    "retry": "تلاش مجدد"
+    "retry": "تلاش مجدد",
+    "forbiddenTitle": "عدم دسترسی",
+    "forbiddenDescription": "شما مجوز مدیریتی لازم برای انجام این عملیات را ندارید."
   }
 }

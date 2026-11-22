@@ -4,7 +4,23 @@
     "description": "Enterprise Cloud & Infrastructure Control Panel",
     "status": "System Operational",
     "loading": "Loading...",
-    "welcome": "Welcome to Cloud Management Platform"
+    "welcome": "Welcome to Cloud Management Platform",
+    "previous": "Previous",
+    "next": "Next",
+    "showingResults": "Showing {from} - {to} of {total} items",
+    "save": "Save",
+    "cancel": "Cancel",
+    "actions": "Actions",
+    "details": "Details",
+    "search": "Search...",
+    "searchPlaceholder": "Search by name, email, phone...",
+    "filter": "Filter",
+    "all": "All",
+    "noData": "No data available",
+    "notFound": "Resource not found",
+    "required": "Required",
+    "id": "ID",
+    "created": "Created"
   },
   "Theme": {
     "toggle": "Toggle theme",
@@ -14,15 +30,91 @@
   },
   "Navigation": {
     "home": "Home",
-    "dashboard": "Dashboard",
+    "dashboard": "Overview",
     "services": "Services",
-    "customers": "Customers"
+    "customers": "Customers",
+    "login": "Login",
+    "logout": "Logout"
+  },
+  "Auth": {
+    "title": "Sign In to Console",
+    "subtitle": "Enter your credentials to access the cloud control panel",
+    "username": "Username",
+    "usernamePlaceholder": "Enter username",
+    "password": "Password",
+    "passwordPlaceholder": "Enter password",
+    "signIn": "Sign In",
+    "signingIn": "Authenticating...",
+    "loginError": "Invalid credentials or unauthorized account.",
+    "role": "Role",
+    "permissions": "Permissions"
+  },
+  "Dashboard": {
+    "overview": "Overview",
+    "overviewDescription": "Key performance metrics and cloud infrastructure stats",
+    "totalCustomers": "Total Customers",
+    "totalCustomersDesc": "Active registered customer entities",
+    "totalServices": "Total Services",
+    "totalServicesDesc": "Orchestrated infrastructure services",
+    "activeServices": "Active Services",
+    "activeServicesDesc": "Running in production",
+    "suspendedServices": "Suspended Services",
+    "suspendedServicesDesc": "Paused or administrative holds",
+    "recentCustomers": "Recent Customers",
+    "recentServices": "Recent Services",
+    "viewAll": "View all"
+  },
+  "Customers": {
+    "title": "Customer Management",
+    "description": "Manage enterprise customers, contact details, and their provisioned services",
+    "addCustomer": "Add Customer",
+    "customerDetails": "Customer Details",
+    "fullName": "Full Name",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email",
+    "phone": "Phone",
+    "registeredAt": "Registration Date",
+    "servicesCount": "Provisioned Services",
+    "customerNotFound": "Customer not found.",
+    "createSuccess": "Customer created successfully.",
+    "editCustomer": "Edit Customer",
+    "updateSuccess": "Customer updated successfully.",
+    "servicesBelonging": "Services Belonging to Customer",
+    "addServiceToCustomer": "Add Service to Customer"
+  },
+  "Services": {
+    "title": "Service Management",
+    "description": "Monitor and control cloud servers, virtual private machines, and storage volumes",
+    "addService": "Add Service",
+    "serviceDetails": "Service Details",
+    "name": "Service Name",
+    "type": "Service Type",
+    "status": "Status",
+    "customer": "Customer ID",
+    "changeStatus": "Change Status",
+    "confirmStatusChange": "Are you sure you want to change this service status to {status}?",
+    "statusUpdated": "Service status updated successfully.",
+    "createSuccess": "Service provisioned successfully.",
+    "noServices": "No services found."
+  },
+  "serviceTypes": {
+    "vps": "Virtual Private Server (VPS)",
+    "cloud_server": "Cloud Server",
+    "dedicated_server": "Dedicated Server",
+    "cloud_storage": "Cloud Storage Volume"
+  },
+  "serviceStatus": {
+    "active": "Active",
+    "suspended": "Suspended"
   },
   "Errors": {
     "notFoundTitle": "Page Not Found",
     "notFoundDescription": "The requested resource could not be found.",
     "serverErrorTitle": "Something went wrong",
     "serverErrorDescription": "An unexpected error occurred. Please try again later.",
-    "retry": "Try again"
+    "retry": "Try again",
+    "forbiddenTitle": "Access Denied",
+    "forbiddenDescription": "You do not have administrative privileges to perform this action."
   }
 }
