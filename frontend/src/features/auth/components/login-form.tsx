@@ -2,40 +2,44 @@
 
 import React, { useState } from "react";
 import { useTranslations } from "next-intl";
-import { useRouter } from "@/i18n/routing";
+import { useRouter, Link } from "@/i18n/routing";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useAuth } from "../hooks/use-auth";
-import { Cloud, Lock, User, AlertCircle } from "lucide-react";
+import { Cloud, Lock, User, AlertCircle, Eye, EyeOff, ArrowLeft, Shield, UserCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { LanguageToggle } from "@/components/shared/language-toggle";
 
-const loginSchema = z.object({
-  username: z.string().min(1, "Username is required"),
-  password: z.string().min(1, "Password is required"),
-});
+const createLoginSchema = (t: (key: string) => string) =>
+  z.object({
+    username: z.string().min(1, t("usernameRequired")),
+    password: z.string().min(1, t("passwordRequired")),
+  });
 
-type LoginFormData = z.infer<typeof loginSchema>;
+type LoginFormData = z.infer<ReturnType<typeof createLoginSchema>>;
 
 export function LoginForm() {
   const tAuth = useTranslations("Auth");
+  const tVal = useTranslations("Validation");
   const router = useRouter();
   const { login, isLoggingIn } = useAuth();
   const [formError, setFormError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(createLoginSchema(tVal)),
     defaultValues: {
-      username: "",
-      password: "",
+      username: "admin_user",
+      password: "SecretPassword123!",
     },
   });
 
@@ -53,8 +57,22 @@ export function LoginForm() {
     }
   };
 
+  const handleSelectRole = (username: string) => {
+    setValue("username", username, { shouldValidate: true });
+    setValue("password", "SecretPassword123!", { shouldValidate: true });
+  };
+
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center p-4 bg-muted/20">
+    <div className="flex min-h-screen flex-col items-center justify-center p-4 bg-muted/20 relative">
+      <div className="absolute top-4 start-4 flex items-center">
+        <Button asChild variant="ghost" size="sm" className="gap-1.5 text-xs text-muted-foreground hover:text-foreground">
+          <Link href="/">
+            <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
+            <span>{tAuth("backToHome")}</span>
+          </Link>
+        </Button>
+      </div>
+
       <div className="absolute top-4 end-4 flex items-center gap-2">
         <LanguageToggle />
         <ThemeToggle />
@@ -75,12 +93,41 @@ export function LoginForm() {
 
         <Card className="shadow-lg border-border">
           <CardHeader className="space-y-1 pb-4">
-            <CardTitle className="text-base font-semibold">Account Sign In</CardTitle>
+            <CardTitle className="text-base font-semibold">{tAuth("cardTitle")}</CardTitle>
             <CardDescription className="text-xs">
-              Direct session authentication with Core API
+              {tAuth("cardDescription")}
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {/* Quick role selection badge buttons */}
+            <div className="mb-4 p-2.5 rounded-lg border border-border bg-muted/40">
+              <span className="block text-[11px] font-medium text-muted-foreground mb-1.5">
+                {tAuth("loginAs")}
+              </span>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 text-xs gap-1.5 h-8 font-normal"
+                  onClick={() => handleSelectRole("admin_user")}
+                >
+                  <Shield className="h-3.5 w-3.5 text-primary" />
+                  <span>{tAuth("adminRole")}</span>
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 text-xs gap-1.5 h-8 font-normal"
+                  onClick={() => handleSelectRole("operator_user")}
+                >
+                  <UserCheck className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                  <span>{tAuth("operatorRole")}</span>
+                </Button>
+              </div>
+            </div>
+
             {formError && (
               <div
                 role="alert"
@@ -123,12 +170,25 @@ export function LoginForm() {
                   <Lock className="absolute start-3 top-2.5 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     placeholder={tAuth("passwordPlaceholder")}
-                    className="ps-9"
+                    className="ps-9 pe-9"
                     error={errors.password?.message}
                     {...register("password")}
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="absolute end-2.5 top-2.5 text-muted-foreground hover:text-foreground transition-colors p-0.5 rounded"
+                    title={showPassword ? tAuth("hidePassword") : tAuth("showPassword")}
+                    data-testid="toggle-password-visibility-btn"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
                 </div>
               </div>
 

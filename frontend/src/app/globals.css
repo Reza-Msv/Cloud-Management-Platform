@@ -106,3 +106,10 @@ body {
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
 }
+
+html[lang="fa"],
+html[dir="rtl"],
+body.font-persian,
+.font-persian {
+  font-family: var(--font-persian), "Vazirmatn", "IRANYekan", "Tahoma", sans-serif !important;
+}

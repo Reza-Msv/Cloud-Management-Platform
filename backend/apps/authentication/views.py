@@ -17,6 +17,16 @@ from apps.authentication.serializers import (
 )
 
 
+class CsrfExemptSessionAuthentication(SessionAuthentication):
+    """
+    SessionAuthentication that returns an authenticate_header so that unauthenticated
+    requests produce an HTTP 401 Unauthorized status code without triggering the browser's
+    built-in HTTP Basic auth credential dialog (which is caused by 'Basic realm=...').
+    """
+    def authenticate_header(self, request):
+        return 'Session'
+
+
 class CSRFView(APIView):
     """
     GET /api/v1/auth/csrf/
@@ -131,7 +141,7 @@ class UserMeView(APIView):
     GET /api/v1/auth/me/
     Retrieves current authenticated user profile, assigned groups, derived roles, and effective permissions.
     """
-    authentication_classes = [BasicAuthentication, SessionAuthentication]
+    authentication_classes = [CsrfExemptSessionAuthentication]
     permission_classes = [IsAuthenticated]
 
     @extend_schema(

@@ -78,8 +78,8 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
     >
       <body
         suppressHydrationWarning
-        className={`min-h-screen bg-background font-sans text-foreground antialiased selection:bg-primary/20 ${
-          isPersian ? "font-persian" : ""
+        className={`min-h-screen bg-background text-foreground antialiased selection:bg-primary/20 ${
+          isPersian ? "font-persian" : "font-sans"
         }`}
       >
         <NextIntlClientProvider locale={locale} messages={messages}>

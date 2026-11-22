@@ -26,14 +26,18 @@ export interface UpdateCustomerPayload {
 }
 
 export const customersApi = {
-  list: async (params?: CustomerListParams): Promise<PaginatedResponse<Customer>> => {
+  list: async (
+    params?: CustomerListParams,
+    signal?: AbortSignal
+  ): Promise<PaginatedResponse<Customer>> => {
     return apiClient<PaginatedResponse<Customer>>("/customers/", {
       params: params as Record<string, string | number | boolean>,
+      signal,
     });
   },
 
-  getById: async (id: number): Promise<Customer> => {
-    return apiClient<Customer>(`/customers/${id}/`);
+  getById: async (id: number, signal?: AbortSignal): Promise<Customer> => {
+    return apiClient<Customer>(`/customers/${id}/`, { signal });
   },
 
   create: async (data: CreateCustomerPayload): Promise<Customer> => {
@@ -52,10 +56,12 @@ export const customersApi = {
 
   listServices: async (
     customerId: number,
-    params?: { page?: number; page_size?: number; status?: string; service_type?: string }
+    params?: { page?: number; page_size?: number; status?: string; service_type?: string },
+    signal?: AbortSignal
   ): Promise<PaginatedResponse<Service>> => {
     return apiClient<PaginatedResponse<Service>>(`/customers/${customerId}/services/`, {
       params: params as Record<string, string | number | boolean>,
+      signal,
     });
   },
 

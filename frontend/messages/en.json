@@ -63,20 +63,29 @@
     "services": "Services",
     "customers": "Customers",
     "login": "Login",
-    "logout": "Logout"
+    "logout": "Logout",
+    "appLogo": "CMP Cloud"
   },
   "Auth": {
     "title": "Sign In to Console",
     "subtitle": "Enter your credentials to access the cloud control panel",
+    "cardTitle": "Account Sign In",
+    "cardDescription": "Direct session authentication with Core API",
     "username": "Username",
     "usernamePlaceholder": "Enter username",
     "password": "Password",
     "passwordPlaceholder": "Enter password",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
     "signIn": "Sign In",
     "signingIn": "Authenticating...",
     "loginError": "Invalid credentials or unauthorized account.",
     "role": "Role",
-    "permissions": "Permissions"
+    "permissions": "Permissions",
+    "loginAs": "Sign in as:",
+    "adminRole": "Admin",
+    "operatorRole": "Operator",
+    "backToHome": "Back to Home"
   },
   "Dashboard": {
     "overview": "Overview",
@@ -91,13 +100,21 @@
     "suspendedServicesDesc": "Paused or administrative holds",
     "recentCustomers": "Recent Customers",
     "recentServices": "Recent Services",
-    "viewAll": "View all"
+    "recentServicesDesc": "Recently provisioned cloud infrastructure",
+    "noRecentServices": "No recent services deployed.",
+    "viewAll": "View all",
+    "analytics": "Platform Analytics & Distribution",
+    "analyticsDesc": "Live comparative breakdown of registered accounts and infrastructure states",
+    "distribution": "Resource Ratio",
+    "activitySummary": "Activity Summary"
   },
   "Customers": {
     "title": "Customer Management",
     "description": "Manage enterprise customers, contact details, and their provisioned services",
     "addCustomer": "Add Customer",
+    "addCustomerDesc": "Enter customer identity details according to enterprise schema.",
     "customerDetails": "Customer Details",
+    "customerDetailsDesc": "Profile and contact records",
     "fullName": "Full Name",
     "firstName": "First Name",
     "lastName": "Last Name",
@@ -110,6 +127,8 @@
     "editCustomer": "Edit Customer",
     "updateSuccess": "Customer updated successfully.",
     "servicesBelonging": "Services Belonging to Customer",
+    "servicesBelongingDesc": "Directly provisioned cloud assets for this customer",
+    "customerIdBadge": "Customer ID: #{id} • Registered on {date}",
     "addServiceToCustomer": "Add Service to Customer"
   },
   "Services": {
@@ -126,6 +145,17 @@
     "statusUpdated": "Service status updated successfully.",
     "createSuccess": "Service provisioned successfully.",
     "noServices": "No services found."
+  },
+  "Validation": {
+    "usernameRequired": "Username is required",
+    "passwordRequired": "Password is required",
+    "firstNameRequired": "First name is required",
+    "lastNameRequired": "Last name is required",
+    "emailRequired": "Valid email is required",
+    "emailAlreadyExists": "Customer with this email already exists.",
+    "phoneRequired": "Valid phone number is required",
+    "serviceNameRequired": "Service name is required",
+    "serviceTypeRequired": "Service type is required"
   },
   "serviceTypes": {
     "vps": "Virtual Private Server (VPS)",

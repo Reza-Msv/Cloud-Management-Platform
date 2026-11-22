@@ -10,14 +10,18 @@ export interface ServiceListParams {
 }
 
 export const servicesApi = {
-  list: async (params?: ServiceListParams): Promise<PaginatedResponse<Service>> => {
+  list: async (
+    params?: ServiceListParams,
+    signal?: AbortSignal
+  ): Promise<PaginatedResponse<Service>> => {
     return apiClient<PaginatedResponse<Service>>("/services/", {
       params: params as Record<string, string | number | boolean>,
+      signal,
     });
   },
 
-  getById: async (id: number): Promise<Service> => {
-    return apiClient<Service>(`/services/${id}/`);
+  getById: async (id: number, signal?: AbortSignal): Promise<Service> => {
+    return apiClient<Service>(`/services/${id}/`, { signal });
   },
 
   updateStatus: async (id: number, status: ServiceStatus): Promise<Service> => {

@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { useTranslations } from "next-intl";
+import React, { useState, useEffect } from "react";
+import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { useCustomers, useCreateCustomer } from "../hooks/use-customers";
 import { useAuth } from "@/features/auth/hooks/use-auth";
@@ -17,31 +17,48 @@ import { UserPlus, Search, Eye, AlertCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { formatDate } from "@/lib/utils";
 
-const createCustomerSchema = z.object({
-  first_name: z.string().min(1, "First name is required"),
-  last_name: z.string().min(1, "Last name is required"),
-  email: z.string().email("Valid email is required"),
-  phone: z.string().min(5, "Valid phone number is required"),
-});
+const createCustomerSchema = (t: (key: string) => string) =>
+  z.object({
+    first_name: z.string().min(1, t("firstNameRequired")),
+    last_name: z.string().min(1, t("lastNameRequired")),
+    email: z.string().email(t("emailRequired")),
+    phone: z.string().min(5, t("phoneRequired")),
+  });
 
-type CreateCustomerFormData = z.infer<typeof createCustomerSchema>;
+type CreateCustomerFormData = z.infer<ReturnType<typeof createCustomerSchema>>;
 
 export function CustomerListView() {
   const t = useTranslations("Customers");
   const tCommon = useTranslations("Common");
+  const tVal = useTranslations("Validation");
+  const locale = useLocale();
   const { isAdmin } = useAuth();
 
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
-  const [search, setSearch] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
+
+  // Debounce search input by 300ms to stop sending high volume requests to the backend
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchInput);
+      setPage(1);
+    }, 300);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchInput]);
 
   const { data, isLoading, isError, error } = useCustomers({
     page,
     page_size: pageSize,
-    search: search || undefined,
+    search: debouncedSearch || undefined,
   });
 
   const createMutation = useCreateCustomer();
@@ -52,7 +69,7 @@ export function CustomerListView() {
     reset,
     formState: { errors, isSubmitting },
   } = useForm<CreateCustomerFormData>({
-    resolver: zodResolver(createCustomerSchema),
+    resolver: zodResolver(createCustomerSchema(tVal)),
     defaultValues: {
       first_name: "",
       last_name: "",
@@ -69,9 +86,14 @@ export function CustomerListView() {
       setModalOpen(false);
     } catch (err: unknown) {
       if (err instanceof Error) {
-        setApiError(err.message);
+        const msg = err.message;
+        if (msg.includes("already exists")) {
+          setApiError(tVal("emailAlreadyExists"));
+        } else {
+          setApiError(msg);
+        }
       } else {
-        setApiError("Failed to create customer");
+        setApiError(tCommon("notFound"));
       }
     }
   };
@@ -108,10 +130,9 @@ export function CustomerListView() {
             <Search className="absolute start-3 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder={tCommon("searchPlaceholder")}
-              value={search}
+              value={searchInput}
               onChange={(e) => {
-                setSearch(e.target.value);
-                setPage(1);
+                setSearchInput(e.target.value);
               }}
               className="ps-9"
             />
@@ -154,7 +175,7 @@ export function CustomerListView() {
                     <TableCell className="text-muted-foreground">{customer.email}</TableCell>
                     <TableCell className="font-mono text-xs">{customer.phone}</TableCell>
                     <TableCell className="text-xs text-muted-foreground">
-                      {new Date(customer.created_at).toLocaleDateString()}
+                      {formatDate(customer.created_at, locale)}
                     </TableCell>
                     <TableCell className="text-end">
                       <Link
@@ -195,7 +216,7 @@ export function CustomerListView() {
         open={modalOpen}
         onOpenChange={setModalOpen}
         title={t("addCustomer")}
-        description="Enter customer identity details according to enterprise schema."
+        description={t("addCustomerDesc")}
       >
         {apiError && (
           <div

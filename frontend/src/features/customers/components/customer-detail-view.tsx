@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useCustomer, useCustomerServices, useCreateCustomerService, useUpdateCustomer } from "../hooks/use-customers";
 import { useUpdateServiceStatus } from "@/features/services/hooks/use-services";
 import { useAuth } from "@/features/auth/hooks/use-auth";
@@ -12,19 +12,24 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Select } from "@/components/ui/select";
 import { Dialog } from "@/components/ui/dialog";
 import { SERVICE_TYPES } from "@/constants";
 import { Plus, Edit2, AlertCircle, RefreshCw, User, Mail, Phone, Calendar } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { formatDate } from "@/lib/utils";
 
-const createServiceSchema = z.object({
-  name: z.string().min(1, "Service name is required"),
-  service_type: z.enum(["vps", "cloud_server", "dedicated_server", "cloud_storage"]),
-});
+const createServiceSchema = (t: (key: string) => string) =>
+  z.object({
+    name: z.string().min(1, t("serviceNameRequired")),
+    service_type: z.enum(["vps", "cloud_server", "dedicated_server", "cloud_storage"], {
+      errorMap: () => ({ message: t("serviceTypeRequired") }),
+    }),
+  });
 
-type CreateServiceFormData = z.infer<typeof createServiceSchema>;
+type CreateServiceFormData = z.infer<ReturnType<typeof createServiceSchema>>;
 
 interface CustomerDetailViewProps {
   customerId: number;
@@ -33,7 +38,11 @@ interface CustomerDetailViewProps {
 export function CustomerDetailView({ customerId }: CustomerDetailViewProps) {
   const t = useTranslations("Customers");
   const tServices = useTranslations("Services");
+  const tServiceTypes = useTranslations("serviceTypes");
+  const tStatus = useTranslations("serviceStatus");
   const tCommon = useTranslations("Common");
+  const tVal = useTranslations("Validation");
+  const locale = useLocale();
   const { isAdmin } = useAuth();
 
   const [addServiceModal, setAddServiceModal] = useState(false);
@@ -51,7 +60,7 @@ export function CustomerDetailView({ customerId }: CustomerDetailViewProps) {
     reset,
     formState: { errors, isSubmitting },
   } = useForm<CreateServiceFormData>({
-    resolver: zodResolver(createServiceSchema),
+    resolver: zodResolver(createServiceSchema(tVal)),
     defaultValues: {
       name: "",
       service_type: "vps",
@@ -109,7 +118,10 @@ export function CustomerDetailView({ customerId }: CustomerDetailViewProps) {
 
       <PageHeader
         title={customer.full_name}
-        description={`Customer ID: #${customer.id} • Registered on ${new Date(customer.created_at).toLocaleDateString()}`}
+        description={t("customerIdBadge", {
+          id: customer.id,
+          date: formatDate(customer.created_at, locale),
+        })}
       >
         <Button
           onClick={() => {
@@ -129,7 +141,7 @@ export function CustomerDetailView({ customerId }: CustomerDetailViewProps) {
         <CardHeader>
           <CardTitle className="text-base">{t("customerDetails")}</CardTitle>
           <CardDescription className="text-xs">
-            Profile and contact records
+            {t("customerDetailsDesc")}
           </CardDescription>
         </CardHeader>
         <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -170,7 +182,7 @@ export function CustomerDetailView({ customerId }: CustomerDetailViewProps) {
             <div>
               <p className="text-xs text-muted-foreground">{t("registeredAt")}</p>
               <p className="text-sm font-semibold">
-                {new Date(customer.created_at).toLocaleDateString()}
+                {formatDate(customer.created_at, locale)}
               </p>
             </div>
           </div>
@@ -182,7 +194,7 @@ export function CustomerDetailView({ customerId }: CustomerDetailViewProps) {
         <CardHeader>
           <CardTitle className="text-base">{t("servicesBelonging")}</CardTitle>
           <CardDescription className="text-xs">
-            Directly provisioned cloud assets for this customer
+            {t("servicesBelongingDesc")}
           </CardDescription>
         </CardHeader>
         <CardContent className="p-0">
@@ -215,11 +227,11 @@ export function CustomerDetailView({ customerId }: CustomerDetailViewProps) {
                         variant={service.status === "active" ? "success" : "warning"}
                         className="capitalize"
                       >
-                        {service.status}
+                        {tStatus(service.status)}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-xs text-muted-foreground">
-                      {new Date(service.created_at).toLocaleDateString()}
+                      {formatDate(service.created_at, locale)}
                     </TableCell>
                     <TableCell className="text-end">
                       <Button
@@ -275,16 +287,18 @@ export function CustomerDetailView({ customerId }: CustomerDetailViewProps) {
             <label className="block text-xs font-medium mb-1">
               {tServices("type")} *
             </label>
-            <select
-              className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            <Select
+              wrapperClassName="w-full"
+              className="h-9 w-full text-sm"
+              error={errors.service_type?.message}
               {...register("service_type")}
             >
-              {SERVICE_TYPES.map((t) => (
-                <option key={t.value} value={t.value}>
-                  {t.value.toUpperCase()}
+              {SERVICE_TYPES.map((st) => (
+                <option key={st.value} value={st.value}>
+                  {tServiceTypes(st.value as any)}
                 </option>
               ))}
-            </select>
+            </Select>
           </div>
 
           <div className="flex justify-end gap-2 pt-2">

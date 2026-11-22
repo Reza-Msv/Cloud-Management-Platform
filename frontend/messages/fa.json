@@ -63,20 +63,29 @@
     "services": "سرویس‌ها",
     "customers": "مشتریان",
     "login": "ورود",
-    "logout": "خروج"
+    "logout": "خروج",
+    "appLogo": "سامانه ابری CMP"
   },
   "Auth": {
     "title": "ورود به کنترل پنل",
     "subtitle": "برای دسترسی به پنل مدیریت ابری، مشخصات حساب خود را وارد کنید",
+    "cardTitle": "ورود به حساب کاربری",
+    "cardDescription": "احراز هویت مستقیم مبتنی بر نشست با هسته API",
     "username": "نام کاربری",
     "usernamePlaceholder": "نام کاربری خود را وارد کنید",
     "password": "رمز عبور",
     "passwordPlaceholder": "رمز عبور خود را وارد کنید",
+    "showPassword": "نمایش رمز عبور",
+    "hidePassword": "عدم نمایش رمز عبور",
     "signIn": "ورود به سیستم",
     "signingIn": "در حال احراز هویت...",
     "loginError": "مشخصات وارد شده نادرست است یا حساب کاربری غیرفعال می‌باشد.",
     "role": "نقش",
-    "permissions": "دسترسی‌ها"
+    "permissions": "دسترسی‌ها",
+    "loginAs": "ورود با نقش:",
+    "adminRole": "مدیر سیستم (Admin)",
+    "operatorRole": "اپراتور (Operator)",
+    "backToHome": "بازگشت به صفحه اصلی"
   },
   "Dashboard": {
     "overview": "نمای کلی",
@@ -91,13 +100,21 @@
     "suspendedServicesDesc": "متوقف یا تعلیق‌شده مدیریتی",
     "recentCustomers": "مشتریان اخیر",
     "recentServices": "سرویس‌های اخیر",
-    "viewAll": "مشاهده همه"
+    "recentServicesDesc": "زیرساخت‌های ابری اخیراً تخصیص‌یافته",
+    "noRecentServices": "هیچ سرویس اخیری مستقر نشده است.",
+    "viewAll": "مشاهده همه",
+    "analytics": "تحلیل و توزیع وضعیت منابع پلتفرم",
+    "analyticsDesc": "نمودار مقایسه‌ای لحظه‌ای از مشتریان ثبت‌شده و وضعیت سرویس‌های ابری",
+    "distribution": "نسبت توزیع منابع",
+    "activitySummary": "خلاصه وضعیت فعالیت"
   },
   "Customers": {
     "title": "مدیریت مشتریان",
     "description": "مدیریت حساب‌های سازمانی مشتریان، اطلاعات تماس و سرویس‌های تخصیص‌یافته",
     "addCustomer": "افزودن مشتری",
+    "addCustomerDesc": "اطلاعات هویتی مشتری را مطابق با الگوی سازمانی وارد کنید.",
     "customerDetails": "مشخصات مشتری",
+    "customerDetailsDesc": "سوابق هویتی و اطلاعات تماس",
     "fullName": "نام و نام خانوادگی",
     "firstName": "نام",
     "lastName": "نام خانوادگی",
@@ -110,6 +127,8 @@
     "editCustomer": "ویرایش مشتری",
     "updateSuccess": "اطلاعات مشتری با موفقیت به‌روزرسانی شد.",
     "servicesBelonging": "سرویس‌های متعلق به مشتری",
+    "servicesBelongingDesc": "منابع و سرویس‌های ابری تخصیص‌یافته مستقیم به این مشتری",
+    "customerIdBadge": "شناسه مشتری: #{id} • تاریخ ثبت‌نام: {date}",
     "addServiceToCustomer": "تخصیص سرویس جدید"
   },
   "Services": {
@@ -126,6 +145,17 @@
     "statusUpdated": "وضعیت سرویس با موفقیت به‌روزرسانی شد.",
     "createSuccess": "سرویس با موفقیت راه‌اندازی شد.",
     "noServices": "هیچ سرویسی یافت نشد."
+  },
+  "Validation": {
+    "usernameRequired": "نام کاربری الزامی است",
+    "passwordRequired": "رمز عبور الزامی است",
+    "firstNameRequired": "نام الزامی است",
+    "lastNameRequired": "نام خانوادگی الزامی است",
+    "emailRequired": "آدرس ایمیل معتبر الزامی است",
+    "emailAlreadyExists": "مشتری با این ایمیل از قبل در سامانه وجود دارد.",
+    "phoneRequired": "شماره تماس معتبر الزامی است",
+    "serviceNameRequired": "نام سرویس الزامی است",
+    "serviceTypeRequired": "نوع سرویس الزامی است"
   },
   "serviceTypes": {
     "vps": "سرور مجازی (VPS)",

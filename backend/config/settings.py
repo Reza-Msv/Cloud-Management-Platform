@@ -142,14 +142,28 @@ SPECTACULAR_SETTINGS = {
 # ==============================================================================
 # CORS & CSRF Configuration (Frontend Integration - Next.js)
 # ==============================================================================
-cors_origins_str = os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost:3000,http://127.0.0.1:3000')
+cors_origins_str = os.getenv(
+    'CORS_ALLOWED_ORIGINS',
+    'http://localhost:3000,http://127.0.0.1:3000,http://localhost:3001,http://127.0.0.1:3001'
+)
 CORS_ALLOWED_ORIGINS = [origin.strip() for origin in cors_origins_str.split(',') if origin.strip()]
+
+# In development mode, ensure active Next.js local development ports (3000 and 3001) are included
+if DEBUG:
+    for dev_origin in ('http://localhost:3000', 'http://127.0.0.1:3000', 'http://localhost:3001', 'http://127.0.0.1:3001'):
+        if dev_origin not in CORS_ALLOWED_ORIGINS:
+            CORS_ALLOWED_ORIGINS.append(dev_origin)
 
 CORS_ALLOW_CREDENTIALS = True
 
 # CSRF Trusted Origins (required for POST/PATCH/DELETE from browser frontend in Django 4.0+)
 csrf_origins_str = os.getenv('CSRF_TRUSTED_ORIGINS', cors_origins_str)
 CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in csrf_origins_str.split(',') if origin.strip()]
+
+if DEBUG:
+    for dev_origin in ('http://localhost:3000', 'http://127.0.0.1:3000', 'http://localhost:3001', 'http://127.0.0.1:3001'):
+        if dev_origin not in CSRF_TRUSTED_ORIGINS:
+            CSRF_TRUSTED_ORIGINS.append(dev_origin)
 
 # Cookie Security Configuration
 SESSION_COOKIE_HTTPONLY = True

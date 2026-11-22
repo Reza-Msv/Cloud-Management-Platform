@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { useServices, useUpdateServiceStatus } from "../hooks/use-services";
 import { PageHeader } from "@/components/shared/page-header";
@@ -11,13 +11,17 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Select } from "@/components/ui/select";
 import { SERVICE_TYPES } from "@/constants";
 import { Server, RefreshCw, Eye, Filter } from "lucide-react";
 import { ServiceStatus } from "@/types";
+import { formatDate } from "@/lib/utils";
 
 export function ServiceListView() {
   const t = useTranslations("Services");
+  const tStatus = useTranslations("serviceStatus");
   const tCommon = useTranslations("Common");
+  const locale = useLocale();
 
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
@@ -61,29 +65,27 @@ export function ServiceListView() {
 
           <div className="flex items-center gap-2">
             <span className="text-xs">{t("status")}:</span>
-            <select
+            <Select
               value={statusFilter}
               onChange={(e) => {
                 setStatusFilter(e.target.value);
                 setPage(1);
               }}
-              className="h-8 rounded-md border border-input bg-background px-2 text-xs shadow-xs focus-visible:outline-none"
             >
               <option value="">{tCommon("all")}</option>
-              <option value="active">Active</option>
-              <option value="suspended">Suspended</option>
-            </select>
+              <option value="active">{tStatus("active")}</option>
+              <option value="suspended">{tStatus("suspended")}</option>
+            </Select>
           </div>
 
           <div className="flex items-center gap-2">
             <span className="text-xs">{t("type")}:</span>
-            <select
+            <Select
               value={typeFilter}
               onChange={(e) => {
                 setTypeFilter(e.target.value);
                 setPage(1);
               }}
-              className="h-8 rounded-md border border-input bg-background px-2 text-xs shadow-xs focus-visible:outline-none"
             >
               <option value="">{tCommon("all")}</option>
               {SERVICE_TYPES.map((st) => (
@@ -91,7 +93,7 @@ export function ServiceListView() {
                   {st.value.toUpperCase()}
                 </option>
               ))}
-            </select>
+            </Select>
           </div>
         </CardContent>
       </Card>
@@ -135,7 +137,7 @@ export function ServiceListView() {
                         variant={service.status === "active" ? "success" : "warning"}
                         className="capitalize"
                       >
-                        {service.status}
+                        {tStatus(service.status)}
                       </Badge>
                     </TableCell>
                     <TableCell>
@@ -147,7 +149,7 @@ export function ServiceListView() {
                       </Link>
                     </TableCell>
                     <TableCell className="text-xs text-muted-foreground">
-                      {new Date(service.created_at).toLocaleDateString()}
+                      {formatDate(service.created_at, locale)}
                     </TableCell>
                     <TableCell className="text-end">
                       <Button

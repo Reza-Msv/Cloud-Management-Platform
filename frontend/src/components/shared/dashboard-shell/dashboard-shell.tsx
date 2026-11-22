@@ -66,7 +66,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
   };
 
   return (
-    <div className="flex min-h-screen bg-muted/20">
+    <div className="flex h-screen overflow-hidden bg-muted/20">
       {/* Mobile Drawer Backdrop */}
       {mobileOpen && (
         <div
@@ -78,44 +78,46 @@ export function DashboardShell({ children }: DashboardShellProps) {
       {/* Sidebar Desktop & Mobile */}
       <aside
         className={cn(
-          "fixed inset-y-0 start-0 z-50 flex flex-col border-e border-border bg-card transition-all duration-300 lg:static",
+          "fixed inset-y-0 start-0 z-50 flex h-screen flex-col border-e border-border bg-card transition-all duration-300 lg:static shrink-0",
           collapsed ? "w-16" : "w-64",
           mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0 rtl:translate-x-full lg:rtl:translate-x-0"
         )}
       >
         {/* Brand Header */}
-        <div className="flex h-16 items-center justify-between px-4 border-b border-border">
-          <Link
-            href="/dashboard"
-            className="flex items-center gap-3 overflow-hidden"
-          >
-            <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 p-1 shadow-xs ring-1 ring-primary/20">
-              <Image
-                src="/logo-symbol.svg"
-                alt="Cloud Management Platform Logo"
-                width={28}
-                height={28}
-                className="h-7 w-7"
-              />
-            </div>
-            {!collapsed && (
+        <div className={cn(
+          "flex h-16 items-center border-b border-border transition-all",
+          collapsed ? "justify-center p-0" : "justify-between px-4"
+        )}>
+          {!collapsed && (
+            <Link
+              href="/dashboard"
+              className="flex items-center gap-3 overflow-hidden min-w-0"
+            >
+              <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 p-1 shadow-xs ring-1 ring-primary/20">
+                <Image
+                  src="/logo-symbol.svg"
+                  alt="Cloud Management Platform Logo"
+                  width={28}
+                  height={28}
+                  className="h-7 w-7 shrink-0 object-contain"
+                />
+              </div>
               <span className="font-semibold text-sm tracking-tight truncate">
-                CMP Cloud
+                {tNav("appLogo")}
               </span>
-            )}
-          </Link>
+            </Link>
+          )}
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setCollapsed(!collapsed)}
-            className="hidden lg:flex h-8 w-8 text-muted-foreground"
+            className={cn(
+              "hidden lg:flex h-8 w-8 text-muted-foreground shrink-0",
+              collapsed && "hidden"
+            )}
             aria-label="Toggle sidebar collapse"
           >
-            {collapsed ? (
-              <ChevronRight className="h-4 w-4 rtl:rotate-180" />
-            ) : (
-              <ChevronLeft className="h-4 w-4 rtl:rotate-180" />
-            )}
+            <ChevronLeft className="h-4 w-4 rtl:rotate-180" />
           </Button>
           <Button
             variant="ghost"
@@ -138,7 +140,8 @@ export function DashboardShell({ children }: DashboardShellProps) {
                 href={item.href}
                 onClick={() => setMobileOpen(false)}
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                  "flex items-center rounded-lg py-2 text-sm font-medium transition-colors",
+                  collapsed ? "justify-center px-0 h-10 w-full" : "gap-3 px-3",
                   item.active
                     ? "bg-primary text-primary-foreground shadow-xs"
                     : "text-muted-foreground hover:bg-muted hover:text-foreground"

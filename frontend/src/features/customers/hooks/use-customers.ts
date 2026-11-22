@@ -8,21 +8,29 @@ import {
   UpdateCustomerPayload,
 } from "@/services/customers-api";
 
+import { useAuthStore } from "@/stores/auth-store";
+
 export const CUSTOMERS_QUERY_KEY = ["customers"] as const;
 
-export function useCustomers(params?: CustomerListParams) {
+export function useCustomers(params?: CustomerListParams, options?: { enabled?: boolean }) {
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const isEnabled = options?.enabled !== undefined ? options.enabled : isAuthenticated;
+
   return useQuery({
     queryKey: [...CUSTOMERS_QUERY_KEY, params],
-    queryFn: () => customersApi.list(params),
+    queryFn: ({ signal }) => customersApi.list(params, signal),
     placeholderData: (prev) => prev,
+    enabled: isEnabled,
   });
 }
 
 export function useCustomer(id: number) {
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+
   return useQuery({
     queryKey: [...CUSTOMERS_QUERY_KEY, id],
-    queryFn: () => customersApi.getById(id),
-    enabled: !!id && !isNaN(id),
+    queryFn: ({ signal }) => customersApi.getById(id, signal),
+    enabled: isAuthenticated && !!id && !isNaN(id),
   });
 }
 
@@ -30,10 +38,12 @@ export function useCustomerServices(
   customerId: number,
   params?: { page?: number; page_size?: number; status?: string; service_type?: string }
 ) {
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+
   return useQuery({
     queryKey: [...CUSTOMERS_QUERY_KEY, customerId, "services", params],
-    queryFn: () => customersApi.listServices(customerId, params),
-    enabled: !!customerId && !isNaN(customerId),
+    queryFn: ({ signal }) => customersApi.listServices(customerId, params, signal),
+    enabled: isAuthenticated && !!customerId && !isNaN(customerId),
   });
 }
 

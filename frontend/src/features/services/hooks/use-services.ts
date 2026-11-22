@@ -4,21 +4,29 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { servicesApi, ServiceListParams } from "@/services/services-api";
 import { ServiceStatus } from "@/types";
 
+import { useAuthStore } from "@/stores/auth-store";
+
 export const SERVICES_QUERY_KEY = ["services"] as const;
 
-export function useServices(params?: ServiceListParams) {
+export function useServices(params?: ServiceListParams, options?: { enabled?: boolean }) {
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const isEnabled = options?.enabled !== undefined ? options.enabled : isAuthenticated;
+
   return useQuery({
     queryKey: [...SERVICES_QUERY_KEY, params],
-    queryFn: () => servicesApi.list(params),
+    queryFn: ({ signal }) => servicesApi.list(params, signal),
     placeholderData: (prev) => prev,
+    enabled: isEnabled,
   });
 }
 
 export function useService(id: number) {
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+
   return useQuery({
     queryKey: [...SERVICES_QUERY_KEY, id],
-    queryFn: () => servicesApi.getById(id),
-    enabled: !!id && !isNaN(id),
+    queryFn: ({ signal }) => servicesApi.getById(id, signal),
+    enabled: isAuthenticated && !!id && !isNaN(id),
   });
 }
 
