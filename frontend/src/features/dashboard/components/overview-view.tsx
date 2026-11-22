@@ -9,6 +9,7 @@ import { PageHeader } from "@/components/shared/page-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Users, Server, CheckCircle2, PauseCircle, ArrowRight, BarChart3, PieChart } from "lucide-react";
+import { SystemHealthSection } from "./system-health-section";
 
 // Stable query parameter objects to avoid re-triggering query observer changes on re-renders
 const CUSTOMERS_QUERY_PARAMS = { page: 1, page_size: 5 };
@@ -345,6 +346,9 @@ export function OverviewView() {
           </CardContent>
         </Card>
       </div>
+
+      {/* System Health & Microservice Inspector */}
+      <SystemHealthSection />
     </div>
   );
 }

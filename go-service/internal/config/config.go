@@ -1,8 +1,10 @@
 package config
 
 import (
+	"bufio"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -17,8 +19,43 @@ type Config struct {
 	DjangoAuthPassword string
 }
 
+// loadDotEnv parses key=val pairs from a .env file only if the key is not already set in the OS environment.
+// OS-provided environment variables strictly take precedence.
+func loadDotEnv(filepath string) {
+	file, err := os.Open(filepath)
+	if err != nil {
+		return
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+		parts := strings.SplitN(line, "=", 2)
+		if len(parts) == 2 {
+			key := strings.TrimSpace(parts[0])
+			val := strings.TrimSpace(parts[1])
+			// Strip surrounding quotes if present
+			if len(val) >= 2 && ((val[0] == '"' && val[len(val)-1] == '"') || (val[0] == '\'' && val[len(val)-1] == '\'')) {
+				val = val[1 : len(val)-1]
+			}
+			// Only set if not already defined in OS environment
+			if _, exists := os.LookupEnv(key); !exists {
+				_ = os.Setenv(key, val)
+			}
+		}
+	}
+}
+
 // Load loads configuration from environment variables with sensible defaults
 func Load() *Config {
+	// Try loading from .env in current working directory or subdirectories
+	loadDotEnv(".env")
+	loadDotEnv("go-service/.env")
+
 	port := 8080
 	if portStr := os.Getenv("HTTP_PORT"); portStr != "" {
 		if p, err := strconv.Atoi(portStr); err == nil && p > 0 {

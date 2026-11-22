@@ -107,7 +107,31 @@ Detailed architectural specifications and design blueprints are located in the `
 
 ---
 
-## 5. Current Status
+## 5. Development & Running Services
 
-- **Phase 1 (Completed & Refined)**: Monorepo structure, aligned architecture documentation, environment variable templates, and Git initialization.
-- **Phase 2 (Upcoming)**: Django REST Framework setup, PostgreSQL model definitions (`Customer` & `Service`), CRUD REST APIs, and automated test suite.
+### Terminal 1 — Django Backend
+```bash
+cd backend
+python manage.py runserver localhost:8000
+```
+
+### Terminal 2 — Go Microservice
+```bash
+cd go-service
+go run ./cmd/server
+```
+
+### Terminal 3 — Next.js Frontend
+```bash
+cd frontend
+pnpm dev
+```
+
+---
+
+## 6. Current Status
+
+- **Phase 1 (Completed)**: Monorepo structure, aligned architecture documentation, environment variable templates, and Git initialization.
+- **Phase 2 (Completed)**: Django REST Framework setup, PostgreSQL model definitions (`Customer` & `Service`), CRUD REST APIs, session/basic authentication, and automated test suite.
+- **Phase 3 (Completed)**: Next.js Frontend SaaS Dashboard (RTL/LTR, Persian/English i18n, dark/light theme, and customer/service management).
+- **Phase 4 (Completed)**: Complete Go microservice with independent `/health` endpoint, Django REST API client integration, Next.js server-side route proxy (`/api/go/health`), and real-time dashboard System Health widget.
