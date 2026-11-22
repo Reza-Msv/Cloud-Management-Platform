@@ -34,6 +34,10 @@ INSTALLED_APPS = [
 
     # Third-party packages
     'rest_framework',
+
+    # Local applications
+    'apps.customers',
+    'apps.services',
 ]
 
 MIDDLEWARE = [
@@ -68,6 +72,17 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database configuration (PostgreSQL)
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 from config.database import DATABASES
+
+# Testing configuration: If running unit tests without CREATEDB privilege in PostgreSQL,
+# allow fallback to an isolated SQLite in-memory database to execute unit tests safely.
+import sys
+if 'test' in sys.argv and os.getenv('USE_POSTGRES_TEST_DB', 'False').lower() not in ('true', '1'):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': ':memory:',
+        }
+    }
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
