@@ -1,0 +1,28 @@
+{
+  "Common": {
+    "title": "سامانه مدیریت ابری",
+    "description": "کنترل پنل سازمانی ابری و زیرساخت",
+    "status": "سیستم فعال است",
+    "loading": "در حال بارگذاری...",
+    "welcome": "به سامانه مدیریت ابری خوش آمدید"
+  },
+  "Theme": {
+    "toggle": "تغییر تم",
+    "light": "روشن",
+    "dark": "تاریک",
+    "system": "سیستم"
+  },
+  "Navigation": {
+    "home": "صفحه اصلی",
+    "dashboard": "داشبورد",
+    "services": "سرویس‌ها",
+    "customers": "مشتریان"
+  },
+  "Errors": {
+    "notFoundTitle": "صفحه یافت نشد",
+    "notFoundDescription": "منبع مورد نظر پیدا نشد.",
+    "serverErrorTitle": "خطایی رخ داده است",
+    "serverErrorDescription": "یک خطای غیرمنتظره رخ داد. لطفاً دوباره تلاش کنید.",
+    "retry": "تلاش مجدد"
+  }
+}

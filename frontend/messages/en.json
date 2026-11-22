@@ -1,0 +1,28 @@
+{
+  "Common": {
+    "title": "Cloud Management Platform",
+    "description": "Enterprise Cloud & Infrastructure Control Panel",
+    "status": "System Operational",
+    "loading": "Loading...",
+    "welcome": "Welcome to Cloud Management Platform"
+  },
+  "Theme": {
+    "toggle": "Toggle theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "Navigation": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "services": "Services",
+    "customers": "Customers"
+  },
+  "Errors": {
+    "notFoundTitle": "Page Not Found",
+    "notFoundDescription": "The requested resource could not be found.",
+    "serverErrorTitle": "Something went wrong",
+    "serverErrorDescription": "An unexpected error occurred. Please try again later.",
+    "retry": "Try again"
+  }
+}
