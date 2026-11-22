@@ -67,8 +67,15 @@ cloud-management-platform/
 
 ### Prerequisites
 - Git
-- macOS with local PostgreSQL installed (configured on port `5432`)
+- macOS with local PostgreSQL 18+ installed and running (configured on port `5432`)
 - Make utility
+
+### Local PostgreSQL Setup
+- **Host**: `localhost`
+- **Port**: `5432`
+- **Database**: `cloud_management_db`
+- **User**: `cloud_management_user`
+- Connection credentials must be populated in `backend/.env` without committing secrets.
 
 ### Environment Setup
 Each service maintains its own `.env.example` template. You can generate local `.env` files using Make:
