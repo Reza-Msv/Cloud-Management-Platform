@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Link, usePathname, useRouter } from "@/i18n/routing";
 import { useAuth } from "@/features/auth/hooks/use-auth";
@@ -88,8 +89,14 @@ export function DashboardShell({ children }: DashboardShellProps) {
             href="/dashboard"
             className="flex items-center gap-3 overflow-hidden"
           >
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-xs">
-              <Cloud className="h-5 w-5" />
+            <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 p-1 shadow-xs ring-1 ring-primary/20">
+              <Image
+                src="/logo-symbol.svg"
+                alt="Cloud Management Platform Logo"
+                width={28}
+                height={28}
+                className="h-7 w-7"
+              />
             </div>
             {!collapsed && (
               <span className="font-semibold text-sm tracking-tight truncate">

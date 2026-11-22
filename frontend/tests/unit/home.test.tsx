@@ -22,9 +22,10 @@ describe("HomeView Component", () => {
 
     expect(screen.getByText("System Operational")).toBeInTheDocument();
     expect(
-      screen.getByText("Welcome to Cloud Management Platform")
+      screen.getByText("Enterprise Cloud Infrastructure & Management")
     ).toBeInTheDocument();
 
     expect(screen.getByTestId("theme-toggle-group")).toBeInTheDocument();
+    expect(screen.getByTestId("landing-login-btn")).toBeInTheDocument();
   });
 });

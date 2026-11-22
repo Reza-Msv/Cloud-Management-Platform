@@ -22,6 +22,35 @@
     "id": "ID",
     "created": "Created"
   },
+  "Landing": {
+    "badge": "System Operational",
+    "heroTitle": "Enterprise Cloud Infrastructure & Management",
+    "heroSubtitle": "A unified platform for orchestrating, monitoring, and scaling mission-critical virtual servers, storage volumes, and client accounts with enterprise-grade security.",
+    "signIn": "Sign In to Console",
+    "goToDashboard": "Go to Dashboard",
+    "feature1Title": "Cloud Resource Monitoring",
+    "feature1Desc": "Centralized real-time monitoring and lifecycle management for cloud instances and virtual servers.",
+    "feature2Title": "Security & Governance",
+    "feature2Desc": "Role-based access control, cryptographic session handling, and strict compliance protection.",
+    "feature3Title": "Service Orchestration",
+    "feature3Desc": "Seamless customer onboarding, automated service provisioning, and state management.",
+    "footerRights": "All rights reserved."
+  },
+  "Metadata": {
+    "siteTitle": "Cloud Management Platform",
+    "homeTitle": "Enterprise Cloud Infrastructure Management",
+    "homeDescription": "Unified control panel for cloud resource provisioning, virtual servers, and client lifecycle management.",
+    "loginTitle": "Sign In",
+    "loginDescription": "Sign in to access your cloud management console and resources.",
+    "dashboardTitle": "Overview",
+    "dashboardDescription": "Real-time metrics, status distribution, and recent activity across your cloud infrastructure.",
+    "customersTitle": "Customer Management",
+    "customersDescription": "View and manage enterprise customer accounts, contact details, and provisioned services.",
+    "customerDetailTitle": "Customer #{id} Details",
+    "customerDetailDescription": "Detailed account profile and provisioned cloud services for customer #{id}.",
+    "servicesTitle": "Service Management",
+    "servicesDescription": "Monitor and control cloud servers, VPS machines, and storage volumes."
+  },
   "Theme": {
     "toggle": "Toggle theme",
     "light": "Light",

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <defs>
+    <linearGradient id="fav-cloud" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#3B82F6" />
+      <stop offset="100%" stop-color="#1D4ED8" />
+    </linearGradient>
+  </defs>
+  <rect width="32" height="32" rx="8" fill="url(#fav-cloud)" />
+  <path d="M10 20C8.89543 20 8 19.1046 8 18C8 16.9823 8.7585 16.1418 9.7451 16.016C10.0958 13.7573 12.043 12 14.3922 12C16.2831 12 17.9175 13.1385 18.6165 14.7723C18.9458 14.5498 19.344 14.4167 19.7725 14.4167C20.8813 14.4167 21.7885 15.2836 21.8151 16.3799C22.6641 16.637 23.2784 17.4196 23.2784 18.3542C23.2784 19.4473 22.3923 20.3333 21.2992 20.3333L10 20Z" fill="white" fill-opacity="0.95" />
+  <circle cx="16" cy="17" r="2" fill="#1D4ED8" />
+  <rect x="9" y="23" width="14" height="1.5" rx="0.75" fill="white" fill-opacity="0.8" />
+</svg>

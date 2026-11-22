@@ -161,7 +161,7 @@ describe("Theme Management - Strict Zero Storage Architecture & Audit", () => {
     expect(document.cookie).toBe("");
   });
 
-  it("audits next-themes ThemeProvider: zero writes to localStorage/sessionStorage/cookies across render and forcedTheme updates", () => {
+  it("audits ThemeProvider DOM sync: zero writes to localStorage/sessionStorage/cookies across render and updates", () => {
     const { rerender } = render(
       <ThemeProvider>
         <div data-testid="child">Test Child</div>

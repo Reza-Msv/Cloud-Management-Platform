@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 48" fill="none">
+  <defs>
+    <linearGradient id="full-cloud-grad" x1="4" y1="4" x2="44" y2="44" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#3B82F6" />
+      <stop offset="100%" stop-color="#1D4ED8" />
+    </linearGradient>
+  </defs>
+
+  <!-- Symbol Icon -->
+  <g transform="translate(0, 0)">
+    <rect x="4" y="4" width="40" height="40" rx="12" fill="url(#full-cloud-grad)" />
+    <!-- Abstract Cloud Silhouette -->
+    <path d="M16 28C14.3431 28 13 26.6569 13 25C13 23.4734 14.1378 22.2127 15.6177 22.024C16.1437 18.636 19.0645 16 22.5882 16C25.4246 16 27.8763 17.7077 28.9248 20.1585C29.4187 19.8247 30.016 19.625 30.6588 19.625C32.3219 19.625 33.6828 20.9254 33.7226 22.5699C34.9961 22.9554 35.9176 24.1294 35.9176 25.5312C35.9176 27.1709 34.5885 28.5 32.9488 28.5L16 28Z" fill="white" fill-opacity="0.95" />
+    <!-- Node network -->
+    <circle cx="24" cy="24" r="3" fill="#1D4ED8" />
+    <circle cx="18" cy="25" r="1.75" fill="#2563EB" />
+    <circle cx="30" cy="25" r="1.75" fill="#2563EB" />
+    <line x1="18" y1="25" x2="24" y2="24" stroke="#2563EB" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="24" y1="24" x2="30" y2="25" stroke="#2563EB" stroke-width="1.5" stroke-linecap="round"/>
+    <!-- Bars -->
+    <rect x="14" y="32" width="20" height="2" rx="1" fill="white" fill-opacity="0.8" />
+    <rect x="18" y="36" width="12" height="2" rx="1" fill="white" fill-opacity="0.5" />
+  </g>
+
+  <!-- Typography: Cloud Management Platform -->
+  <g transform="translate(56, 0)">
+    <text x="0" y="24" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="700" letter-spacing="-0.02em" fill="currentColor">
+      Cloud Platform
+    </text>
+    <text x="0" y="38" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="500" letter-spacing="0.05em" text-transform="uppercase" fill="#64748B">
+      Management Console
+    </text>
+  </g>
+</svg>
