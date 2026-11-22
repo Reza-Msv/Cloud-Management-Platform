@@ -7,17 +7,20 @@ import { useAuth } from "@/features/auth/hooks/use-auth";
 import { DashboardShell } from "@/components/shared/dashboard-shell";
 
 export function ProtectedLayout({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, isError } = useAuth();
   const router = useRouter();
   const locale = useLocale();
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
+    // Only redirect to login once the auth check has settled and confirmed failure.
+    // Avoid triggering premature redirects while loading or before isError settles.
+    if (!isLoading && (isError || !isAuthenticated)) {
       router.replace(`/${locale}/login`);
     }
-  }, [isLoading, isAuthenticated, router, locale]);
+  }, [isLoading, isError, isAuthenticated, router, locale]);
 
-  if (isLoading) {
+  // Keep children unmounted while authenticating session or if unauthenticated
+  if (isLoading || !isAuthenticated) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-3">
@@ -26,10 +29,6 @@ export function ProtectedLayout({ children }: { children: React.ReactNode }) {
         </div>
       </div>
     );
-  }
-
-  if (!isAuthenticated) {
-    return null;
   }
 
   return <DashboardShell>{children}</DashboardShell>;

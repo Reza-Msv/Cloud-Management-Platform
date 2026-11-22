@@ -51,6 +51,7 @@ export function useAuth() {
     user,
     isAuthenticated: !!user,
     isLoading: meQuery.isPending,
+    isError: meQuery.isError,
     isAdmin,
     isOperator,
     login: loginMutation.mutateAsync,

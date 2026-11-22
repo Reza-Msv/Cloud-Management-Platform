@@ -38,37 +38,37 @@ export function HomeView() {
     <div className="flex min-h-screen flex-col">
       {/* Top Navigation Bar */}
       <header className="border-b border-border bg-card/70 backdrop-blur-md sticky top-0 z-40">
-        <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between gap-2 px-3 sm:px-6 lg:px-8">
           {/* Logo & Brand Identity */}
-          <Link href="/" className="flex items-center gap-3">
-            <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 p-1 shadow-xs ring-1 ring-primary/20">
+          <Link href="/" className="flex items-center gap-2 sm:gap-3 min-w-0 shrink">
+            <div className="relative flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 p-1 shadow-xs ring-1 ring-primary/20">
               <Image
                 src="/logo-symbol.svg"
                 alt="Cloud Management Platform Logo"
                 width={32}
                 height={32}
                 priority
-                className="h-8 w-8"
+                className="h-7 w-7 sm:h-8 sm:w-8"
               />
             </div>
-            <div>
-              <h1 className="text-base font-semibold leading-none tracking-tight">
+            <div className="min-w-0 hidden sm:block">
+              <h1 className="text-sm sm:text-base font-semibold leading-none tracking-tight truncate">
                 {tCommon("title")}
               </h1>
-              <p className="mt-1 text-xs text-muted-foreground">
+              <p className="mt-1 text-[11px] sm:text-xs text-muted-foreground truncate">
                 {tCommon("description")}
               </p>
             </div>
           </Link>
 
           {/* Header Action Controls */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             <LanguageToggle />
             <ThemeToggle />
-            <Button asChild size="sm" className="ms-2">
+            <Button asChild size="sm" className="hidden sm:inline-flex ms-1 sm:ms-2 h-8 text-xs sm:text-sm px-2.5 sm:px-3">
               <Link href="/login" data-testid="landing-login-btn" className="inline-flex items-center">
                 <span>{tNav("login")}</span>
-                <ArrowRight className="ms-1.5 h-3.5 w-3.5 shrink-0 rtl:rotate-180" />
+                <ArrowRight className="ms-1 sm:ms-1.5 h-3.5 w-3.5 shrink-0 rtl:rotate-180" />
               </Link>
             </Button>
           </div>

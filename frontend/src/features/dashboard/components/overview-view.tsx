@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { useCustomers } from "@/features/customers/hooks/use-customers";
@@ -10,33 +10,25 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Users, Server, CheckCircle2, PauseCircle, ArrowRight, BarChart3, PieChart } from "lucide-react";
 
+// Stable query parameter objects to avoid re-triggering query observer changes on re-renders
+const CUSTOMERS_QUERY_PARAMS = { page: 1, page_size: 5 };
+const TOTAL_SERVICES_QUERY_PARAMS = { page: 1, page_size: 5 };
+const ACTIVE_SERVICES_QUERY_PARAMS = { status: "active", page: 1, page_size: 1 };
+const SUSPENDED_SERVICES_QUERY_PARAMS = { status: "suspended", page: 1, page_size: 1 };
+
 export function OverviewView() {
   const t = useTranslations("Dashboard");
   const tNav = useTranslations("Navigation");
   const tStatus = useTranslations("serviceStatus");
 
   // Derive counts from existing backend pagination metadata count
-  const { data: customersData, isLoading: isCustomersLoading } = useCustomers({
-    page: 1,
-    page_size: 5,
-  });
+  const { data: customersData, isLoading: isCustomersLoading } = useCustomers(CUSTOMERS_QUERY_PARAMS);
 
-  const { data: totalServicesData, isLoading: isServicesLoading } = useServices({
-    page: 1,
-    page_size: 5,
-  });
+  const { data: totalServicesData, isLoading: isServicesLoading } = useServices(TOTAL_SERVICES_QUERY_PARAMS);
 
-  const { data: activeServicesData } = useServices({
-    status: "active",
-    page: 1,
-    page_size: 1,
-  });
+  const { data: activeServicesData } = useServices(ACTIVE_SERVICES_QUERY_PARAMS);
 
-  const { data: suspendedServicesData } = useServices({
-    status: "suspended",
-    page: 1,
-    page_size: 1,
-  });
+  const { data: suspendedServicesData } = useServices(SUSPENDED_SERVICES_QUERY_PARAMS);
 
   const totalCustomers = customersData?.count ?? 0;
   const totalServices = totalServicesData?.count ?? 0;

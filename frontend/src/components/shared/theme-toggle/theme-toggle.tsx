@@ -17,7 +17,7 @@ export function ThemeToggle() {
       data-testid="theme-toggle-group"
       data-current-theme={theme}
       data-resolved-theme={resolvedTheme}
-      className="inline-flex items-center gap-1 rounded-lg border border-border bg-card p-1 shadow-xs"
+      className="inline-flex items-center gap-0.5 sm:gap-1 rounded-lg border border-border bg-card p-0.5 sm:p-1 shadow-xs"
     >
       <Button
         type="button"
@@ -26,10 +26,10 @@ export function ThemeToggle() {
         onClick={() => setTheme("light")}
         aria-pressed={theme === "light"}
         data-testid="theme-light-btn"
-        className="h-8 px-2.5 text-xs font-medium"
+        className="h-7 sm:h-8 px-2 sm:px-2.5 text-xs font-medium"
       >
-        <Sun className="h-4 w-4" aria-hidden="true" />
-        <span className="ms-1.5">{t("light")}</span>
+        <Sun className="h-3.5 w-3.5 sm:h-4 sm:w-4" aria-hidden="true" />
+        <span className="ms-1.5 hidden sm:inline">{t("light")}</span>
       </Button>
 
       <Button
@@ -39,10 +39,10 @@ export function ThemeToggle() {
         onClick={() => setTheme("dark")}
         aria-pressed={theme === "dark"}
         data-testid="theme-dark-btn"
-        className="h-8 px-2.5 text-xs font-medium"
+        className="h-7 sm:h-8 px-2 sm:px-2.5 text-xs font-medium"
       >
-        <Moon className="h-4 w-4" aria-hidden="true" />
-        <span className="ms-1.5">{t("dark")}</span>
+        <Moon className="h-3.5 w-3.5 sm:h-4 sm:w-4" aria-hidden="true" />
+        <span className="ms-1.5 hidden sm:inline">{t("dark")}</span>
       </Button>
 
       <Button
@@ -52,10 +52,10 @@ export function ThemeToggle() {
         onClick={() => setTheme("system")}
         aria-pressed={theme === "system"}
         data-testid="theme-system-btn"
-        className="h-8 px-2.5 text-xs font-medium"
+        className="h-7 sm:h-8 px-2 sm:px-2.5 text-xs font-medium"
       >
-        <Monitor className="h-4 w-4" aria-hidden="true" />
-        <span className="ms-1.5">{t("system")}</span>
+        <Monitor className="h-3.5 w-3.5 sm:h-4 sm:w-4" aria-hidden="true" />
+        <span className="ms-1.5 hidden sm:inline">{t("system")}</span>
       </Button>
     </div>
   );

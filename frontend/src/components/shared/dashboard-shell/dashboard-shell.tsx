@@ -191,20 +191,20 @@ export function DashboardShell({ children }: DashboardShellProps) {
       {/* Main Content Area */}
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Top Navbar */}
-        <header className="flex h-16 items-center justify-between border-b border-border bg-card/60 px-4 sm:px-6 backdrop-blur-md sticky top-0 z-30">
-          <div className="flex items-center gap-3">
+        <header className="flex h-16 items-center justify-between border-b border-border bg-card/60 px-3 sm:px-6 backdrop-blur-md sticky top-0 z-30">
+          <div className="flex items-center gap-2 sm:gap-3">
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setMobileOpen(true)}
-              className="lg:hidden h-9 w-9 text-muted-foreground"
+              className="lg:hidden h-9 w-9 text-muted-foreground shrink-0"
               aria-label="Open navigation menu"
             >
               <Menu className="h-5 w-5" />
             </Button>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             <LanguageToggle />
             <ThemeToggle />
           </div>
