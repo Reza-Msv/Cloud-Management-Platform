@@ -127,6 +127,12 @@ cd frontend
 pnpm dev
 ```
 
+### Terminal 4 — PHP Service (Laravel)
+```bash
+cd php-service
+php artisan serve --host=127.0.0.1 --port=8001
+```
+
 ---
 
 ## 6. Current Status
@@ -135,3 +141,4 @@ pnpm dev
 - **Phase 2 (Completed)**: Django REST Framework setup, PostgreSQL model definitions (`Customer` & `Service`), CRUD REST APIs, session/basic authentication, and automated test suite.
 - **Phase 3 (Completed)**: Next.js Frontend SaaS Dashboard (RTL/LTR, Persian/English i18n, dark/light theme, and customer/service management).
 - **Phase 4 (Completed)**: Complete Go microservice with independent `/health` endpoint, Django REST API client integration, Next.js server-side route proxy (`/api/go/health`), and real-time dashboard System Health widget.
+- **Phase 5 (Completed)**: Complete PHP (Laravel 11+) customer inquiry & service management module, Django REST API client integration, relationship security validation, and automated test suite.
