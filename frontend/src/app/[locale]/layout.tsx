@@ -70,10 +70,16 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
   const isPersian = locale === "fa";
 
   return (
-    <html lang={locale} dir={dir} suppressHydrationWarning className={isPersian ? persianFont.variable : undefined}>
+    <html
+      lang={locale}
+      dir={dir}
+      suppressHydrationWarning
+      className={isPersian ? persianFont.variable : undefined}
+    >
       <body
-        className={`min-h-screen bg-background text-foreground antialiased selection:bg-primary/20 ${
-          isPersian ? "font-persian" : "font-sans"
+        suppressHydrationWarning
+        className={`min-h-screen bg-background font-sans text-foreground antialiased selection:bg-primary/20 ${
+          isPersian ? "font-persian" : ""
         }`}
       >
         <NextIntlClientProvider locale={locale} messages={messages}>

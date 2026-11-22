@@ -3,7 +3,13 @@ import Image from "next/image";
 import type { Metadata } from "next";
 import { useTranslations } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { Activity, ShieldCheck, Database, ArrowRight, Server } from "lucide-react";
+import {
+  Activity,
+  ShieldCheck,
+  Database,
+  ArrowRight,
+  Server,
+} from "lucide-react";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { LanguageToggle } from "@/components/shared/language-toggle";
 import { Link } from "@/i18n/routing";
@@ -152,9 +158,14 @@ export function HomeView() {
       {/* Footer */}
       <footer className="border-t border-border bg-card/40 py-6">
         <div className="container mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 sm:flex-row sm:px-6 lg:px-8">
-          <p className="text-xs text-muted-foreground">
-            &copy; 2026 {tCommon("title")}. {tLanding("footerRights")}
-          </p>
+          <div className="flex flex-col items-center gap-1 sm:items-start">
+            <p className="text-xs text-muted-foreground">
+              &copy; 2026 {tCommon("title")}. {tLanding("footerRights")}
+            </p>
+            <p className="text-xs font-medium text-foreground/80">
+              Developed by Reza Mousavi
+            </p>
+          </div>
           <div className="flex items-center gap-4 text-xs text-muted-foreground">
             <span className="font-mono">Next.js 16.4.6</span>
             <span>&bull;</span>
