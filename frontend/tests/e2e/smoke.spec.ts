@@ -66,9 +66,16 @@ test.describe("Auth & Dashboard Flows", () => {
   });
 
   test("unauthenticated access to dashboard redirects to login", async ({ page }) => {
-    page.on("response", (res) => console.log("RES:", res.status(), res.url()));
+    // Intercept backend auth/me call in E2E sandbox to simulate unauthenticated 401 response
+    await page.route("**/api/v1/auth/me/", (route) => {
+      route.fulfill({
+        status: 401,
+        contentType: "application/json",
+        body: JSON.stringify({ detail: "Authentication credentials were not provided." }),
+      });
+    });
+
     await page.goto("/en/dashboard");
-    // ProtectedLayout redirects to /login when not authenticated
     await expect(page).toHaveURL(/\/login/);
   });
 });
