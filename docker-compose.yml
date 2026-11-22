@@ -1,90 +1,160 @@
-# ==============================================================================
-# Cloud Management Platform (CMP) - Docker Compose (Initial Placeholder)
-# ==============================================================================
-# NOTICE:
-# This file is an architectural placeholder for future development phases.
-# In Phase 1, development is structured locally (PostgreSQL on host macOS).
-# Complete multi-container orchestration, networks, volumes, and healthchecks
-# will be fully implemented and validated in the containerization phase.
-# ==============================================================================
-
-version: '3.8'
-
 services:
   # ----------------------------------------------------------------------------
-  # Database Service (PostgreSQL) - Planned for Phase 7 (Currently Local on macOS)
+  # 1. PostgreSQL Database (Exclusive Data Owner: Django Core Backend)
   # ----------------------------------------------------------------------------
-  # postgres:
-  #   image: postgres:16-alpine
-  #   container_name: cmp_postgres
-  #   restart: unless-stopped
-  #   environment:
-  #     POSTGRES_DB: ${DB_NAME:-cmp_core_db}
-  #     POSTGRES_USER: ${DB_USER:-cmp_user}
-  #     POSTGRES_PASSWORD: ${DB_PASSWORD:-cmp_password}
-  #   ports:
-  #     - "${DB_PORT:-5432}:5432"
-  #   volumes:
-  #     - postgres_data:/var/lib/postgresql/data
+  db:
+    image: postgres:16-alpine
+    container_name: cmp_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-cloud_management_db}
+      POSTGRES_USER: ${DB_USER:-cloud_management_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-cloud_management_db}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-cloud_management_user} -d ${DB_NAME:-cloud_management_db}"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+      start_period: 3s
+    networks:
+      - cmp_network
 
   # ----------------------------------------------------------------------------
-  # Core Backend (Django REST Framework) - Single source of truth & DB owner
+  # 2. Django Core REST API Backend
   # ----------------------------------------------------------------------------
-  # backend:
-  #   build:
-  #     context: ./backend
-  #     dockerfile: ../infrastructure/docker/Dockerfile.backend
-  #   container_name: cmp_backend
-  #   ports:
-  #     - "${BACKEND_PORT:-8000}:8000"
-  #   depends_on:
-  #     - postgres
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: cmp_backend
+    restart: unless-stopped
+    environment:
+      SECRET_KEY: ${SECRET_KEY:-reg-pzg-d-t85o-s-wj1v-y-mh96-5flw9kf-a58-s2-1b9avh}
+      DEBUG: ${DEBUG:-False}
+      ALLOWED_HOSTS: localhost,127.0.0.1,backend,frontend,go-service,php-service
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-cloud_management_db}
+      DB_USER: ${DB_USER:-cloud_management_user}
+      DB_PASSWORD: ${DB_PASSWORD:-cloud_management_db}
+      DB_CONNECTION_MAX_AGE: 600
+      CORS_ALLOWED_ORIGINS: http://localhost:3000,http://127.0.0.1:3000,http://localhost:3001,http://127.0.0.1:3001,http://frontend:3000
+      CSRF_TRUSTED_ORIGINS: http://localhost:3000,http://127.0.0.1:3000,http://localhost:3001,http://127.0.0.1:3001,http://frontend:3000
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f -s -o /dev/null http://localhost:8000/api/docs/ || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - cmp_network
 
   # ----------------------------------------------------------------------------
-  # Frontend (Next.js + TypeScript)
+  # 3. Independent Go Service (Health & Service Status Inspector)
   # ----------------------------------------------------------------------------
-  # frontend:
-  #   build:
-  #     context: ./frontend
-  #     dockerfile: ../infrastructure/docker/Dockerfile.frontend
-  #   container_name: cmp_frontend
-  #   ports:
-  #     - "${FRONTEND_PORT:-3000}:3000"
+  go-service:
+    build:
+      context: ./go-service
+      dockerfile: Dockerfile
+    container_name: cmp_go_service
+    restart: unless-stopped
+    environment:
+      HTTP_PORT: 8080
+      APP_ENV: production
+      APP_VERSION: 1.0.0
+      DJANGO_API_BASE_URL: http://backend:8000/api/v1
+      DJANGO_API_TIMEOUT: 5s
+      DJANGO_AUTH_USERNAME: ${DJANGO_AUTH_USERNAME:-admin_user}
+      DJANGO_AUTH_PASSWORD: ${DJANGO_AUTH_PASSWORD:-SecretPassword123!}
+    ports:
+      - "8080:8080"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f -s -o /dev/null http://localhost:8080/health || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 3s
+    networks:
+      - cmp_network
 
   # ----------------------------------------------------------------------------
-  # Independent Go Service (High-concurrency & Cloud sync)
+  # 4. Laravel PHP Service (Customer & Service Management Module)
   # ----------------------------------------------------------------------------
-  # go-service:
-  #   build:
-  #     context: ./go-service
-  #     dockerfile: ../infrastructure/docker/Dockerfile.go
-  #   container_name: cmp_go_service
-  #   ports:
-  #     - "${GO_SERVICE_PORT:-8080}:8080"
+  php-service:
+    build:
+      context: ./php-service
+      dockerfile: Dockerfile
+    container_name: cmp_php_service
+    restart: unless-stopped
+    environment:
+      APP_NAME: "Cloud Management PHP"
+      APP_ENV: production
+      APP_KEY: ${APP_KEY:-base64:cWRy1E2yHy0jwtPK0n7ZPzVyj1A1OBjuCcdwn2g5eNI=}
+      APP_DEBUG: "false"
+      APP_URL: http://localhost:8001
+      DJANGO_API_BASE_URL: http://backend:8000/api/v1
+      DJANGO_API_TIMEOUT: 10
+      DJANGO_AUTH_USERNAME: ${DJANGO_AUTH_USERNAME:-admin_user}
+      DJANGO_AUTH_PASSWORD: ${DJANGO_AUTH_PASSWORD:-SecretPassword123!}
+    ports:
+      - "8001:8001"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f -s -o /dev/null http://localhost:8001/up || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+    networks:
+      - cmp_network
 
   # ----------------------------------------------------------------------------
-  # Additional Backend Service (PHP + Laravel)
+  # 5. Next.js Frontend Dashboard
   # ----------------------------------------------------------------------------
-  # php-service:
-  #   build:
-  #     context: ./php-service
-  #     dockerfile: ../infrastructure/docker/Dockerfile.php
-  #   container_name: cmp_php_service
-  #   ports:
-  #     - "${PHP_SERVICE_PORT:-8001}:8001"
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: cmp_frontend
+    restart: unless-stopped
+    environment:
+      PORT: 3000
+      NEXT_PUBLIC_APP_NAME: "Cloud Management Platform"
+      NEXT_PUBLIC_API_BASE_URL: http://localhost:8000/api/v1
+      GO_SERVICE_BASE_URL: http://go-service:8080
+    ports:
+      - "3000:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+      go-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f -s -o /dev/null http://localhost:3000 || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - cmp_network
 
-  # ----------------------------------------------------------------------------
-  # Reverse Proxy & Ingress Gateway (Nginx)
-  # ----------------------------------------------------------------------------
-  # nginx:
-  #   image: nginx:alpine
-  #   container_name: cmp_nginx
-  #   ports:
-  #     - "80:80"
-  #     - "443:443"
-  #   volumes:
-  #     - ./infrastructure/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-  #     - ./infrastructure/nginx/conf.d:/etc/nginx/conf.d:ro
+volumes:
+  postgres_data:
+    name: cmp_postgres_data
 
-# volumes:
-#   postgres_data:
+networks:
+  cmp_network:
+    name: cmp_network
+    driver: bridge

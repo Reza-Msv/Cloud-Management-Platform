@@ -135,10 +135,63 @@ php artisan serve --host=127.0.0.1 --port=8001
 
 ---
 
-## 6. Current Status
+## 6. Docker & Containerized Environment (Phase 6)
+
+The entire platform can be built and orchestrated using Docker Compose.
+
+### Port Allocation & Service Topology
+
+| Service | Container Name | Host Port | Internal Port | Technology | Healthcheck Endpoint |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **PostgreSQL** | `cmp_db` | *(internal)* | `5432` | PostgreSQL 16 Alpine | `pg_isready` |
+| **Django Backend** | `cmp_backend` | `8000` | `8000` | Python 3.12 / Gunicorn / DRF | `/api/docs/` |
+| **Go Service** | `cmp_go_service` | `8080` | `8080` | Go 1.22 Alpine (multi-stage) | `/health` |
+| **PHP Service** | `cmp_php_service` | `8001` | `8001` | PHP 8.4 Alpine / Laravel 11 | `/up` |
+| **Next.js Frontend** | `cmp_frontend` | `3000` | `3000` | Node.js 22 Alpine / Next.js 16 | `/` (HTTP 200/307) |
+
+All containers communicate over an isolated Docker bridge network (`cmp_network`). PostgreSQL data is safely persisted in the named Docker volume `cmp_postgres_data`.
+
+### Starting the Platform with Docker Compose
+
+1. **Build all container images:**
+   ```bash
+   docker compose build
+   ```
+
+2. **Start the containers in detached mode:**
+   ```bash
+   docker compose up -d
+   ```
+
+3. **Check container status and health:**
+   ```bash
+   docker compose ps
+   ```
+
+4. **Follow service logs:**
+   ```bash
+   docker compose logs -f
+   # Or inspect a specific service:
+   docker compose logs -f backend
+   docker compose logs -f go-service
+   ```
+
+5. **Stop containers safely without losing database data:**
+   ```bash
+   docker compose stop
+   # Or take down the containers (preserves the cmp_postgres_data volume):
+   docker compose down
+   ```
+
+> **Database Safety Notice**: Never run `docker compose down -v` unless you intentionally wish to permanently destroy the persistent database volume.
+
+---
+
+## 7. Current Status
 
 - **Phase 1 (Completed)**: Monorepo structure, aligned architecture documentation, environment variable templates, and Git initialization.
 - **Phase 2 (Completed)**: Django REST Framework setup, PostgreSQL model definitions (`Customer` & `Service`), CRUD REST APIs, session/basic authentication, and automated test suite.
 - **Phase 3 (Completed)**: Next.js Frontend SaaS Dashboard (RTL/LTR, Persian/English i18n, dark/light theme, and customer/service management).
 - **Phase 4 (Completed)**: Complete Go microservice with independent `/health` endpoint, Django REST API client integration, Next.js server-side route proxy (`/api/go/health`), and real-time dashboard System Health widget.
 - **Phase 5 (Completed)**: Complete PHP (Laravel 11+) customer inquiry & service management module, Django REST API client integration, relationship security validation, and automated test suite.
+- **Phase 6 (Completed)**: Complete Docker & Docker Compose container infrastructure with multi-stage builds, non-root security runners, health checks, dependency chaining, and persistent volume storage.

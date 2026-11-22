@@ -1,0 +1,10 @@
+/vendor/
+/node_modules/
+.env
+.env.backup
+.env.production
+.DS_Store
+/storage/*.key
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
