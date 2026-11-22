@@ -11,9 +11,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.customers.selectors import get_customer_by_id
-from apps.services.selectors import get_customer_services
-from apps.services.serializers import ServiceSerializer
-from apps.services.services import create_service
+from apps.services.selectors import get_customer_services, get_service_by_id
+from apps.services.serializers import ServiceSerializer, ServiceStatusUpdateSerializer
+from apps.services.services import create_service, update_service_status
 
 
 class CustomerServiceListCreateAPIView(APIView):
@@ -73,3 +73,99 @@ class CustomerServiceListCreateAPIView(APIView):
         )
 
         return Response(ServiceSerializer(service).data, status=status.HTTP_201_CREATED)
+
+
+class ServiceDetailAPIView(APIView):
+    """
+    GET /api/v1/services/{service_id}/ -> Retrieve service details by ID.
+    Protected with SessionAuthentication & BasicAuthentication (IsAuthenticated).
+    """
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def _get_service(self, service_id: int):
+        service = get_service_by_id(service_id=service_id)
+        if service is None:
+            raise NotFound({'detail': 'Service not found.'})
+        return service
+
+    @extend_schema(
+        summary="Retrieve service details",
+        description="Retrieve comprehensive details of a specific service by ID.",
+        responses={
+            status.HTTP_200_OK: ServiceSerializer,
+            status.HTTP_401_UNAUTHORIZED: OpenApiResponse(description="Authentication credentials were not provided."),
+            status.HTTP_403_FORBIDDEN: OpenApiResponse(description="Permission denied."),
+            status.HTTP_404_NOT_FOUND: OpenApiResponse(description="Service not found."),
+        },
+        tags=["Services"],
+    )
+    def get(self, request, service_id: int):
+        service = self._get_service(service_id)
+        serializer = ServiceSerializer(service)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class ServiceStatusUpdateAPIView(APIView):
+    """
+    PATCH /api/v1/services/{service_id}/status/ -> Update operational status of service.
+    Protected with SessionAuthentication & BasicAuthentication (IsAuthenticated).
+    """
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def _get_service(self, service_id: int):
+        service = get_service_by_id(service_id=service_id)
+        if service is None:
+            raise NotFound({'detail': 'Service not found.'})
+        return service
+
+    @extend_schema(
+        summary="Update service status",
+        description="Change operational status of an existing service. Allowed values: 'active', 'suspended'.",
+        request=ServiceStatusUpdateSerializer,
+        responses={
+            status.HTTP_200_OK: ServiceSerializer,
+            status.HTTP_400_BAD_REQUEST: OpenApiResponse(description="Invalid status value or empty payload."),
+            status.HTTP_401_UNAUTHORIZED: OpenApiResponse(description="Authentication credentials were not provided."),
+            status.HTTP_403_FORBIDDEN: OpenApiResponse(description="Permission denied."),
+            status.HTTP_404_NOT_FOUND: OpenApiResponse(description="Service not found."),
+        },
+        examples=[
+            OpenApiExample(
+                "Suspend Service Request",
+                value={"status": "suspended"},
+                request_only=True,
+            ),
+            OpenApiExample(
+                "Activate Service Request",
+                value={"status": "active"},
+                request_only=True,
+            ),
+            OpenApiExample(
+                "Status Update Response",
+                value={
+                    "id": 1,
+                    "name": "Production Web Worker",
+                    "service_type": "vps",
+                    "status": "suspended",
+                    "customer": 1,
+                    "created_at": "2026-11-22T05:34:07.123456Z",
+                },
+                response_only=True,
+                status_codes=[str(status.HTTP_200_OK)],
+            ),
+        ],
+        tags=["Services"],
+    )
+    def patch(self, request, service_id: int):
+        service = self._get_service(service_id)
+        serializer = ServiceStatusUpdateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        updated_service = update_service_status(
+            service=service,
+            status=serializer.validated_data['status'],
+        )
+
+        return Response(ServiceSerializer(updated_service).data, status=status.HTTP_200_OK)

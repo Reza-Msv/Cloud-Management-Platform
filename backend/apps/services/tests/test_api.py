@@ -18,12 +18,21 @@ class CustomerServiceAPITest(APITestCase):
             email='kaveh@example.com',
             phone='+989123333333',
         )
-        self.url = reverse('services:customer-service-list-create', kwargs={'customer_id': self.customer.id})
+        self.url = reverse('customers:customer-services', kwargs={'customer_id': self.customer.id})
         self.valid_payload = {
             'name': 'Production Worker VM',
             'service_type': ServiceType.VPS,
         }
 
+    def _service_detail_url(self, service_id: int):
+        return reverse('services:service-detail', kwargs={'service_id': service_id})
+
+    def _service_status_url(self, service_id: int):
+        return reverse('services:service-status-update', kwargs={'service_id': service_id})
+
+    # ==========================
+    # Customer Services Tests
+    # ==========================
     def test_unauthenticated_requests_are_rejected(self):
         """Requests without authentication return 401 or 403."""
         response = self.client.get(self.url)
@@ -46,7 +55,6 @@ class CustomerServiceAPITest(APITestCase):
         self.assertEqual(data['customer'], self.customer.id)
         self.assertIn('created_at', data)
 
-        # Verify database record
         service = Service.objects.get(id=data['id'])
         self.assertEqual(service.customer, self.customer)
         self.assertEqual(service.status, ServiceStatus.ACTIVE)
@@ -84,14 +92,14 @@ class CustomerServiceAPITest(APITestCase):
 
     def test_post_service_for_nonexistent_customer(self):
         """POST returns 404 Not Found when customer_id does not exist."""
-        nonexistent_url = reverse('services:customer-service-list-create', kwargs={'customer_id': 999999})
+        nonexistent_url = reverse('customers:customer-services', kwargs={'customer_id': 999999})
         self.client.force_authenticate(user=self.user)
         response = self.client.post(nonexistent_url, self.valid_payload, format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_get_service_for_nonexistent_customer(self):
         """GET returns 404 Not Found when customer_id does not exist."""
-        nonexistent_url = reverse('services:customer-service-list-create', kwargs={'customer_id': 999999})
+        nonexistent_url = reverse('customers:customer-services', kwargs={'customer_id': 999999})
         self.client.force_authenticate(user=self.user)
         response = self.client.get(nonexistent_url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -122,7 +130,6 @@ class CustomerServiceAPITest(APITestCase):
             phone='000',
         )
         self.client.force_authenticate(user=self.user)
-        # Attempt to set customer in body to other_customer
         payload = {
             'name': 'Tampered Service',
             'service_type': ServiceType.VPS,
@@ -130,7 +137,6 @@ class CustomerServiceAPITest(APITestCase):
         }
         response = self.client.post(self.url, payload, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        # Service MUST be attached to self.customer, not other_customer
         self.assertEqual(response.data['customer'], self.customer.id)
         created_service = Service.objects.get(id=response.data['id'])
         self.assertEqual(created_service.customer, self.customer)
@@ -149,3 +155,169 @@ class CustomerServiceAPITest(APITestCase):
         self.assertEqual(response.data['status'], ServiceStatus.ACTIVE)
         created_service = Service.objects.get(id=response.data['id'])
         self.assertEqual(created_service.status, ServiceStatus.ACTIVE)
+
+    # ==========================
+    # Service Detail Tests
+    # ==========================
+    def test_get_service_detail_success(self):
+        """GET /api/v1/services/{id}/ returns 200 OK with correct service attributes."""
+        service = Service.objects.create(
+            customer=self.customer,
+            name='Detail Test VM',
+            service_type=ServiceType.VPS,
+            status=ServiceStatus.ACTIVE,
+        )
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(self._service_detail_url(service.id))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.data
+        self.assertEqual(data['id'], service.id)
+        self.assertEqual(data['name'], 'Detail Test VM')
+        self.assertEqual(data['service_type'], ServiceType.VPS)
+        self.assertEqual(data['status'], ServiceStatus.ACTIVE)
+        self.assertEqual(data['customer'], self.customer.id)
+
+    def test_get_service_detail_not_found(self):
+        """GET /api/v1/services/{id}/ returns 404 for non-existent service ID."""
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(self._service_detail_url(999999))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_get_service_detail_unauthenticated(self):
+        """GET /api/v1/services/{id}/ without authentication returns 401 or 403."""
+        service = Service.objects.create(
+            customer=self.customer,
+            name='Unauth Test',
+            service_type=ServiceType.VPS,
+            status=ServiceStatus.ACTIVE,
+        )
+        response = self.client.get(self._service_detail_url(service.id))
+        self.assertIn(response.status_code, [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN])
+
+    # ==========================
+    # Service Status Update Tests
+    # ==========================
+    def test_patch_service_status_to_suspended_success(self):
+        """PATCH /api/v1/services/{id}/status/ updates status from active to suspended."""
+        service = Service.objects.create(
+            customer=self.customer,
+            name='Suspend Me',
+            service_type=ServiceType.VPS,
+            status=ServiceStatus.ACTIVE,
+        )
+        self.client.force_authenticate(user=self.user)
+        response = self.client.patch(
+            self._service_status_url(service.id),
+            {'status': ServiceStatus.SUSPENDED},
+            format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['status'], ServiceStatus.SUSPENDED)
+        service.refresh_from_db()
+        self.assertEqual(service.status, ServiceStatus.SUSPENDED)
+        # Ensure customer relation didn't change
+        self.assertEqual(service.customer, self.customer)
+
+    def test_patch_service_status_to_active_success(self):
+        """PATCH /api/v1/services/{id}/status/ updates status from suspended to active."""
+        service = Service.objects.create(
+            customer=self.customer,
+            name='Activate Me',
+            service_type=ServiceType.VPS,
+            status=ServiceStatus.SUSPENDED,
+        )
+        self.client.force_authenticate(user=self.user)
+        response = self.client.patch(
+            self._service_status_url(service.id),
+            {'status': ServiceStatus.ACTIVE},
+            format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['status'], ServiceStatus.ACTIVE)
+        service.refresh_from_db()
+        self.assertEqual(service.status, ServiceStatus.ACTIVE)
+
+    def test_patch_service_status_invalid_value(self):
+        """PATCH returns 400 Bad Request when status value is invalid."""
+        service = Service.objects.create(
+            customer=self.customer,
+            name='Bad Status Test',
+            service_type=ServiceType.VPS,
+            status=ServiceStatus.ACTIVE,
+        )
+        self.client.force_authenticate(user=self.user)
+        response = self.client.patch(
+            self._service_status_url(service.id),
+            {'status': 'deleted_or_unknown'},
+            format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('status', response.data)
+
+    def test_patch_service_status_empty_body(self):
+        """PATCH returns 400 Bad Request when body is empty."""
+        service = Service.objects.create(
+            customer=self.customer,
+            name='Empty Body Test',
+            service_type=ServiceType.VPS,
+            status=ServiceStatus.ACTIVE,
+        )
+        self.client.force_authenticate(user=self.user)
+        response = self.client.patch(
+            self._service_status_url(service.id),
+            {},
+            format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_patch_service_status_does_not_modify_other_fields(self):
+        """PATCH only changes status; other fields cannot be modified through this endpoint."""
+        service = Service.objects.create(
+            customer=self.customer,
+            name='Protected Name',
+            service_type=ServiceType.CLOUD_STORAGE,
+            status=ServiceStatus.ACTIVE,
+        )
+        original_created_at = service.created_at
+        self.client.force_authenticate(user=self.user)
+        response = self.client.patch(
+            self._service_status_url(service.id),
+            {
+                'status': ServiceStatus.SUSPENDED,
+                'name': 'Attempted New Name',
+                'service_type': 'vps',
+            },
+            format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        service.refresh_from_db()
+        self.assertEqual(service.status, ServiceStatus.SUSPENDED)
+        self.assertEqual(service.name, 'Protected Name')
+        self.assertEqual(service.service_type, ServiceType.CLOUD_STORAGE)
+        self.assertEqual(service.customer, self.customer)
+        self.assertEqual(service.created_at, original_created_at)
+
+    def test_patch_service_status_not_found(self):
+        """PATCH returns 404 Not Found for non-existent service ID."""
+        self.client.force_authenticate(user=self.user)
+        response = self.client.patch(
+            self._service_status_url(999999),
+            {'status': ServiceStatus.SUSPENDED},
+            format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_patch_service_status_unauthenticated(self):
+        """PATCH without authentication returns 401 or 403."""
+        service = Service.objects.create(
+            customer=self.customer,
+            name='Unauth Patch',
+            service_type=ServiceType.VPS,
+            status=ServiceStatus.ACTIVE,
+        )
+        response = self.client.patch(
+            self._service_status_url(service.id),
+            {'status': ServiceStatus.SUSPENDED},
+            format='json',
+        )
+        self.assertIn(response.status_code, [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN])

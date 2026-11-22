@@ -2,7 +2,7 @@ from django.test import TestCase
 
 from apps.customers.models import Customer
 from apps.services.models import ServiceStatus, ServiceType
-from apps.services.serializers import ServiceSerializer
+from apps.services.serializers import ServiceSerializer, ServiceStatusUpdateSerializer
 
 
 class ServiceSerializerTest(TestCase):
@@ -61,3 +61,40 @@ class ServiceSerializerTest(TestCase):
         self.assertNotIn('status', serializer.validated_data)
         self.assertNotIn('customer', serializer.validated_data)
         self.assertNotIn('created_at', serializer.validated_data)
+
+
+class ServiceStatusUpdateSerializerTest(TestCase):
+    def test_accepts_active_status(self):
+        """Serializer accepts status='active'."""
+        serializer = ServiceStatusUpdateSerializer(data={'status': ServiceStatus.ACTIVE})
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        self.assertEqual(serializer.validated_data['status'], ServiceStatus.ACTIVE)
+
+    def test_accepts_suspended_status(self):
+        """Serializer accepts status='suspended'."""
+        serializer = ServiceStatusUpdateSerializer(data={'status': ServiceStatus.SUSPENDED})
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        self.assertEqual(serializer.validated_data['status'], ServiceStatus.SUSPENDED)
+
+    def test_rejects_invalid_status(self):
+        """Serializer rejects unknown status values."""
+        serializer = ServiceStatusUpdateSerializer(data={'status': 'terminated'})
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('status', serializer.errors)
+
+    def test_rejects_empty_body(self):
+        """Serializer rejects empty dictionary."""
+        serializer = ServiceStatusUpdateSerializer(data={})
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('status', serializer.errors)
+
+    def test_other_fields_ignored_in_status_update(self):
+        """Other fields like name, customer, service_type are not present in validated_data."""
+        serializer = ServiceStatusUpdateSerializer(data={
+            'status': ServiceStatus.SUSPENDED,
+            'name': 'Hacked Name',
+            'customer': 123,
+            'service_type': 'vps',
+        })
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        self.assertEqual(serializer.validated_data, {'status': ServiceStatus.SUSPENDED})

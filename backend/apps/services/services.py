@@ -21,3 +21,19 @@ def create_service(
             status=ServiceStatus.ACTIVE,
         )
     return service
+
+
+def update_service_status(
+    *,
+    service: Service,
+    status: str,
+) -> Service:
+    """
+    Updates operational status of an existing Service instance and persists it.
+    Uses an atomic block with select_for_update to avoid race conditions.
+    """
+    with transaction.atomic():
+        locked_service = Service.objects.select_for_update().get(id=service.id)
+        locked_service.status = status
+        locked_service.save(update_fields=['status'])
+    return locked_service

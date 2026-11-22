@@ -32,5 +32,5 @@ urlpatterns = [
 
     # API Routes
     path('api/v1/customers/', include('apps.customers.urls', namespace='customers')),
-    path('api/v1/customers/', include('apps.services.urls', namespace='services')),
+    path('api/v1/services/', include('apps.services.urls', namespace='services')),
 ]
