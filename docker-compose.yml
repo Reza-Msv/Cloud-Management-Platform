@@ -1,0 +1,90 @@
+# ==============================================================================
+# Cloud Management Platform (CMP) - Docker Compose (Initial Placeholder)
+# ==============================================================================
+# NOTICE:
+# This file is an architectural placeholder for future development phases.
+# In Phase 1, development is structured locally (PostgreSQL on host macOS).
+# Complete multi-container orchestration, networks, volumes, and healthchecks
+# will be fully implemented and validated in the containerization phase.
+# ==============================================================================
+
+version: '3.8'
+
+services:
+  # ----------------------------------------------------------------------------
+  # Database Service (PostgreSQL) - Planned for Phase 7 (Currently Local on macOS)
+  # ----------------------------------------------------------------------------
+  # postgres:
+  #   image: postgres:16-alpine
+  #   container_name: cmp_postgres
+  #   restart: unless-stopped
+  #   environment:
+  #     POSTGRES_DB: ${DB_NAME:-cmp_core_db}
+  #     POSTGRES_USER: ${DB_USER:-cmp_user}
+  #     POSTGRES_PASSWORD: ${DB_PASSWORD:-cmp_password}
+  #   ports:
+  #     - "${DB_PORT:-5432}:5432"
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+
+  # ----------------------------------------------------------------------------
+  # Core Backend (Django REST Framework) - Single source of truth & DB owner
+  # ----------------------------------------------------------------------------
+  # backend:
+  #   build:
+  #     context: ./backend
+  #     dockerfile: ../infrastructure/docker/Dockerfile.backend
+  #   container_name: cmp_backend
+  #   ports:
+  #     - "${BACKEND_PORT:-8000}:8000"
+  #   depends_on:
+  #     - postgres
+
+  # ----------------------------------------------------------------------------
+  # Frontend (Next.js + TypeScript)
+  # ----------------------------------------------------------------------------
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: ../infrastructure/docker/Dockerfile.frontend
+  #   container_name: cmp_frontend
+  #   ports:
+  #     - "${FRONTEND_PORT:-3000}:3000"
+
+  # ----------------------------------------------------------------------------
+  # Independent Go Service (High-concurrency & Cloud sync)
+  # ----------------------------------------------------------------------------
+  # go-service:
+  #   build:
+  #     context: ./go-service
+  #     dockerfile: ../infrastructure/docker/Dockerfile.go
+  #   container_name: cmp_go_service
+  #   ports:
+  #     - "${GO_SERVICE_PORT:-8080}:8080"
+
+  # ----------------------------------------------------------------------------
+  # Additional Backend Service (PHP + Laravel)
+  # ----------------------------------------------------------------------------
+  # php-service:
+  #   build:
+  #     context: ./php-service
+  #     dockerfile: ../infrastructure/docker/Dockerfile.php
+  #   container_name: cmp_php_service
+  #   ports:
+  #     - "${PHP_SERVICE_PORT:-8001}:8001"
+
+  # ----------------------------------------------------------------------------
+  # Reverse Proxy & Ingress Gateway (Nginx)
+  # ----------------------------------------------------------------------------
+  # nginx:
+  #   image: nginx:alpine
+  #   container_name: cmp_nginx
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./infrastructure/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+  #     - ./infrastructure/nginx/conf.d:/etc/nginx/conf.d:ro
+
+# volumes:
+#   postgres_data:
