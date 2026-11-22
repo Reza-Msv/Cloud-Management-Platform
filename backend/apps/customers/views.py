@@ -1,5 +1,6 @@
 from drf_spectacular.utils import (
     OpenApiExample,
+    OpenApiParameter,
     OpenApiResponse,
     extend_schema,
 )
@@ -10,22 +11,34 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from apps.common.pagination import StandardResultsSetPagination
+from apps.common.permissions import CustomerPermission
 from apps.customers.selectors import get_customer_by_id, get_customers_list
 from apps.customers.serializers import CustomerSerializer
 
 
 class CustomerListCreateAPIView(APIView):
     """
-    GET  /api/v1/customers/ -> List all customers ordered by created_at desc.
+    GET  /api/v1/customers/ -> List all customers with pagination, search, and filtering.
     POST /api/v1/customers/ -> Create a new customer.
-    Protected with SessionAuthentication & BasicAuthentication (IsAuthenticated).
+    Protected with BasicAuthentication & SessionAuthentication (IsAuthenticated + CustomerPermission).
     """
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [IsAuthenticated]
+    authentication_classes = [BasicAuthentication, SessionAuthentication]
+    permission_classes = [IsAuthenticated, CustomerPermission]
+    pagination_class = StandardResultsSetPagination
 
     @extend_schema(
         summary="List customers",
-        description="Retrieve a list of all registered customers ordered by created_at descending.",
+        description="Retrieve a paginated list of customers. Supports keyword search across all fields as well as specific field filters.",
+        parameters=[
+            OpenApiParameter(name='page', type=int, location=OpenApiParameter.QUERY, description='Page number within paginated results (default: 1).'),
+            OpenApiParameter(name='page_size', type=int, location=OpenApiParameter.QUERY, description='Number of results per page (default: 10, max: 100).'),
+            OpenApiParameter(name='search', type=str, location=OpenApiParameter.QUERY, description='Search across first_name, last_name, email, and phone.'),
+            OpenApiParameter(name='first_name', type=str, location=OpenApiParameter.QUERY, description='Filter by first name (case-insensitive substring).'),
+            OpenApiParameter(name='last_name', type=str, location=OpenApiParameter.QUERY, description='Filter by last name (case-insensitive substring).'),
+            OpenApiParameter(name='email', type=str, location=OpenApiParameter.QUERY, description='Filter by email address (case-insensitive substring).'),
+            OpenApiParameter(name='phone', type=str, location=OpenApiParameter.QUERY, description='Filter by phone number (substring).'),
+        ],
         responses={
             status.HTTP_200_OK: CustomerSerializer(many=True),
             status.HTTP_401_UNAUTHORIZED: OpenApiResponse(description="Authentication credentials were not provided."),
@@ -34,7 +47,26 @@ class CustomerListCreateAPIView(APIView):
         tags=["Customers"],
     )
     def get(self, request):
-        customers = get_customers_list()
+        search = request.query_params.get('search')
+        first_name = request.query_params.get('first_name')
+        last_name = request.query_params.get('last_name')
+        email = request.query_params.get('email')
+        phone = request.query_params.get('phone')
+
+        customers = get_customers_list(
+            search=search,
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            phone=phone,
+        )
+
+        paginator = self.pagination_class()
+        paginated_customers = paginator.paginate_queryset(customers, request, view=self)
+        if paginated_customers is not None:
+            serializer = CustomerSerializer(paginated_customers, many=True)
+            return paginator.get_paginated_response(serializer.data)
+
         serializer = CustomerSerializer(customers, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -87,10 +119,10 @@ class CustomerDetailAPIView(APIView):
     """
     GET   /api/v1/customers/{id}/ -> Retrieve a customer by ID.
     PATCH /api/v1/customers/{id}/ -> Partially update customer details.
-    Protected with SessionAuthentication & BasicAuthentication (IsAuthenticated).
+    Protected with SessionAuthentication & BasicAuthentication (IsAuthenticated + CustomerPermission).
     """
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [IsAuthenticated]
+    authentication_classes = [BasicAuthentication, SessionAuthentication]
+    permission_classes = [IsAuthenticated, CustomerPermission]
 
     def _get_customer(self, customer_id: int):
         customer = get_customer_by_id(customer_id=customer_id)

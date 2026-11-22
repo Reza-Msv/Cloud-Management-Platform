@@ -3,6 +3,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from apps.common.permissions import setup_roles_and_permissions, ROLE_ADMIN, ROLE_OPERATOR
 from apps.customers.models import Customer
 from apps.services.models import Service, ServiceStatus, ServiceType
 
@@ -11,7 +12,9 @@ User = get_user_model()
 
 class CustomerServiceAPITest(APITestCase):
     def setUp(self):
+        self.roles = setup_roles_and_permissions()
         self.user = User.objects.create_user(username='serviceadmin', password='password123')
+        self.user.groups.add(self.roles[ROLE_ADMIN])
         self.customer = Customer.objects.create(
             first_name='Kaveh',
             last_name='Ahangar',
@@ -77,18 +80,22 @@ class CustomerServiceAPITest(APITestCase):
         self.client.force_authenticate(user=self.user)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIsInstance(response.data, list)
-        self.assertEqual(len(response.data), 2)
-        self.assertEqual(response.data[0]['id'], s2.id)
-        self.assertEqual(response.data[1]['id'], s1.id)
-        self.assertEqual(response.data[0]['customer'], self.customer.id)
+        self.assertIn('results', response.data)
+        self.assertEqual(response.data['count'], 2)
+        results = response.data['results']
+        self.assertIsInstance(results, list)
+        self.assertEqual(len(results), 2)
+        self.assertEqual(results[0]['id'], s2.id)
+        self.assertEqual(results[1]['id'], s1.id)
+        self.assertEqual(results[0]['customer'], self.customer.id)
 
     def test_get_customer_services_empty_list(self):
         """GET returns 200 OK with empty list when customer has no services."""
         self.client.force_authenticate(user=self.user)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, [])
+        self.assertEqual(response.data['count'], 0)
+        self.assertEqual(response.data['results'], [])
 
     def test_post_service_for_nonexistent_customer(self):
         """POST returns 404 Not Found when customer_id does not exist."""

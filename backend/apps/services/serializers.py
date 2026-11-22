@@ -29,6 +29,13 @@ class ServiceSerializer(serializers.ModelSerializer):
             )
         return value
 
+    def validate_status(self, value: str) -> str:
+        if value not in ServiceStatus.values:
+            raise serializers.ValidationError(
+                f"Invalid status. Must be one of: {list(ServiceStatus.values)}"
+            )
+        return value
+
 
 class ServiceStatusUpdateSerializer(serializers.Serializer):
     status = serializers.ChoiceField(

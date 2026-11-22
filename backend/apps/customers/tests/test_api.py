@@ -3,6 +3,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from apps.common.permissions import setup_roles_and_permissions, ROLE_ADMIN, ROLE_OPERATOR
 from apps.customers.models import Customer
 
 User = get_user_model()
@@ -10,7 +11,9 @@ User = get_user_model()
 
 class CustomerAPITest(APITestCase):
     def setUp(self):
+        self.roles = setup_roles_and_permissions()
         self.user = User.objects.create_user(username='testadmin', password='securepassword123')
+        self.user.groups.add(self.roles[ROLE_ADMIN])
         self.url = reverse('customers:customer-list-create')
         self.valid_payload = {
             'first_name': 'Neda',
@@ -51,17 +54,20 @@ class CustomerAPITest(APITestCase):
 
     def test_get_customers_list_success(self):
         """Authenticated user gets list of customers with 200 OK ordered by -created_at."""
-        c1 = Customer.objects.create(first_name='One', last_name='A', email='one@example.com', phone='1')
-        c2 = Customer.objects.create(first_name='Two', last_name='B', email='two@example.com', phone='2')
+        c1 = Customer.objects.create(first_name='One', last_name='A', email='one@example.com', phone='+989121111111')
+        c2 = Customer.objects.create(first_name='Two', last_name='B', email='two@example.com', phone='+989122222222')
 
         self.client.force_authenticate(user=self.user)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIsInstance(response.data, list)
-        self.assertEqual(len(response.data), 2)
-        self.assertEqual(response.data[0]['id'], c2.id)
-        self.assertEqual(response.data[1]['id'], c1.id)
-        self.assertEqual(response.data[0]['full_name'], 'Two B')
+        self.assertIn('results', response.data)
+        self.assertEqual(response.data['count'], 2)
+        results = response.data['results']
+        self.assertIsInstance(results, list)
+        self.assertEqual(len(results), 2)
+        self.assertEqual(results[0]['id'], c2.id)
+        self.assertEqual(results[1]['id'], c1.id)
+        self.assertEqual(results[0]['full_name'], 'Two B')
 
     def test_create_customer_missing_fields(self):
         """Incomplete payload returns 400 Bad Request."""
