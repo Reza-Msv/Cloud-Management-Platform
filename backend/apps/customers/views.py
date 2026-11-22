@@ -1,3 +1,8 @@
+from drf_spectacular.utils import (
+    OpenApiExample,
+    OpenApiResponse,
+    extend_schema,
+)
 from rest_framework import status
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication
 from rest_framework.exceptions import NotFound
@@ -18,11 +23,59 @@ class CustomerListCreateAPIView(APIView):
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        summary="List customers",
+        description="Retrieve a list of all registered customers ordered by created_at descending.",
+        responses={
+            status.HTTP_200_OK: CustomerSerializer(many=True),
+            status.HTTP_401_UNAUTHORIZED: OpenApiResponse(description="Authentication credentials were not provided."),
+            status.HTTP_403_FORBIDDEN: OpenApiResponse(description="Permission denied."),
+        },
+        tags=["Customers"],
+    )
     def get(self, request):
         customers = get_customers_list()
         serializer = CustomerSerializer(customers, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @extend_schema(
+        summary="Create customer",
+        description="Create a new customer profile. Email must be unique.",
+        request=CustomerSerializer,
+        responses={
+            status.HTTP_201_CREATED: CustomerSerializer,
+            status.HTTP_400_BAD_REQUEST: OpenApiResponse(description="Validation error (e.g. invalid email format, missing fields, or duplicate email)."),
+            status.HTTP_401_UNAUTHORIZED: OpenApiResponse(description="Authentication credentials were not provided."),
+            status.HTTP_403_FORBIDDEN: OpenApiResponse(description="Permission denied."),
+        },
+        examples=[
+            OpenApiExample(
+                "Valid Customer Request",
+                value={
+                    "first_name": "Reza",
+                    "last_name": "Mousavi",
+                    "email": "reza.mousavi@example.com",
+                    "phone": "+989123456789",
+                },
+                request_only=True,
+            ),
+            OpenApiExample(
+                "Successful Customer Response",
+                value={
+                    "id": 1,
+                    "first_name": "Reza",
+                    "last_name": "Mousavi",
+                    "full_name": "Reza Mousavi",
+                    "email": "reza.mousavi@example.com",
+                    "phone": "+989123456789",
+                    "created_at": "2026-11-22T05:25:35.123456Z",
+                },
+                response_only=True,
+                status_codes=[str(status.HTTP_201_CREATED)],
+            ),
+        ],
+        tags=["Customers"],
+    )
     def post(self, request):
         serializer = CustomerSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -45,11 +98,58 @@ class CustomerDetailAPIView(APIView):
             raise NotFound({'detail': 'Customer not found.'})
         return customer
 
+    @extend_schema(
+        summary="Retrieve customer details",
+        description="Retrieve comprehensive details of a specific customer by ID.",
+        responses={
+            status.HTTP_200_OK: CustomerSerializer,
+            status.HTTP_401_UNAUTHORIZED: OpenApiResponse(description="Authentication credentials were not provided."),
+            status.HTTP_403_FORBIDDEN: OpenApiResponse(description="Permission denied."),
+            status.HTTP_404_NOT_FOUND: OpenApiResponse(description="Customer not found."),
+        },
+        tags=["Customers"],
+    )
     def get(self, request, customer_id: int):
         customer = self._get_customer(customer_id)
         serializer = CustomerSerializer(customer)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @extend_schema(
+        summary="Partially update customer",
+        description="Update one or more attributes of an existing customer. Read-only fields (id, created_at, full_name) are ignored.",
+        request=CustomerSerializer,
+        responses={
+            status.HTTP_200_OK: CustomerSerializer,
+            status.HTTP_400_BAD_REQUEST: OpenApiResponse(description="Validation error (e.g. invalid email format or email taken by another customer)."),
+            status.HTTP_401_UNAUTHORIZED: OpenApiResponse(description="Authentication credentials were not provided."),
+            status.HTTP_403_FORBIDDEN: OpenApiResponse(description="Permission denied."),
+            status.HTTP_404_NOT_FOUND: OpenApiResponse(description="Customer not found."),
+        },
+        examples=[
+            OpenApiExample(
+                "Partial Update Request",
+                value={
+                    "phone": "+989120000000",
+                },
+                request_only=True,
+            ),
+            OpenApiExample(
+                "Updated Customer Response",
+                value={
+                    "id": 1,
+                    "first_name": "Reza",
+                    "last_name": "Mousavi",
+                    "full_name": "Reza Mousavi",
+                    "email": "reza.mousavi@example.com",
+                    "phone": "+989120000000",
+                    "created_at": "2026-11-22T05:25:35.123456Z",
+                },
+                response_only=True,
+                status_codes=[str(status.HTTP_200_OK)],
+            ),
+        ],
+        tags=["Customers"],
+    )
     def patch(self, request, customer_id: int):
         customer = self._get_customer(customer_id)
         serializer = CustomerSerializer(customer, data=request.data, partial=True)
