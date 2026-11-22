@@ -242,7 +242,15 @@ class AuthenticationAPITest(APITestCase):
         self.assertEqual(csrf_res.status_code, status.HTTP_200_OK)
         csrf_token = csrf_res.json()['csrfToken']
 
-        # 2. Login to establish authenticated session
+        # 2. Login WITHOUT CSRF token fails with 403 Forbidden (Login CSRF Protection)
+        bad_login = csrf_client.post(
+            self.login_url,
+            {'username': 'admin_john', 'password': 'SecretPassword123!'},
+            content_type='application/json',
+        )
+        self.assertEqual(bad_login.status_code, status.HTTP_403_FORBIDDEN)
+
+        # 3. Login WITH valid CSRF token succeeds to establish authenticated session
         login_res = csrf_client.post(
             self.login_url,
             {'username': 'admin_john', 'password': 'SecretPassword123!'},
@@ -252,7 +260,7 @@ class AuthenticationAPITest(APITestCase):
         self.assertEqual(login_res.status_code, status.HTTP_200_OK)
         self.assertIn(settings.SESSION_COOKIE_NAME, csrf_client.cookies)
 
-        # 3. Mutative customer creation without CSRF token fails with 403 Forbidden
+        # 4. Mutative customer creation without CSRF token fails with 403 Forbidden
         bad_post = csrf_client.post(
             reverse('customers:customer-list-create'),
             {'first_name': 'A', 'last_name': 'B', 'email': 'a@b.com', 'phone': '+989121111111'},
@@ -261,7 +269,7 @@ class AuthenticationAPITest(APITestCase):
         self.assertEqual(bad_post.status_code, status.HTTP_403_FORBIDDEN)
         self.assertIn('CSRF', str(bad_post.content))
 
-        # 4. Mutative customer creation WITH valid post-login CSRF token header succeeds (201 Created)
+        # 5. Mutative customer creation WITH valid post-login CSRF token header succeeds (201 Created)
         post_login_csrf = csrf_client.cookies[settings.CSRF_COOKIE_NAME].value
         good_post = csrf_client.post(
             reverse('customers:customer-list-create'),

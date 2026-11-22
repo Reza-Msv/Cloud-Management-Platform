@@ -50,10 +50,17 @@ class LoginView(APIView):
     """
     POST /api/v1/auth/login/
     Authenticates user with username & password, starts a secure Django session, and sets sessionid cookie.
-    Enforces standard CSRF protection for session authentication.
+    Enforces standard CSRF protection against Login CSRF attacks.
     """
     authentication_classes = [BasicAuthentication, SessionAuthentication]
     permission_classes = [AllowAny]
+
+    @classmethod
+    def as_view(cls, **initkwargs):
+        view = super().as_view(**initkwargs)
+        # Protect against Login CSRF by enforcing Django's CsrfViewMiddleware
+        view.csrf_exempt = False
+        return view
 
     @extend_schema(
         summary="User Login",
